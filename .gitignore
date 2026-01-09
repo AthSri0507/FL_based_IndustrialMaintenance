@@ -1,0 +1,54 @@
+# Python
+.venv/
+*.pyc
+__pycache__/
+.env
+.pytest_cache/
+
+# Data (never commit generated data)
+data/**
+!data/.gitkeep
+
+# Experiments & logs
+experiments/**
+logs/
+runs/
+
+# Model checkpoints
+*.pt
+*.pth
+*.ckpt
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temp
+tmp/
+cache/
+*.log
+
+# Tests (ignore generated tests only)
+test_*.py
+tests/
+
+#Missalaneous
+projectdesc/
+tasklist.md
+projectplan.md
+requirements.md
+
+#Remove later
+scripts/
+docs/
+notebooks/

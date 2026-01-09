@@ -1,0 +1,9 @@
+numpy
+pandas
+scipy
+pyyaml
+torch
+torchvision
+pytest
+flake8
+black
