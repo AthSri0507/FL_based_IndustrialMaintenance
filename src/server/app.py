@@ -15,6 +15,9 @@ import threading
 
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
+from fastapi import Request
+
+from src.privacy.verify import validate_message
 
 
 # ---------------------- Data Models ----------------------
@@ -272,3 +275,22 @@ def reset_round():
     """Reset round state to idle."""
     server.reset_round()
     return {"message": "Round state reset to idle"}
+
+
+@app.post("/rounds/submit", tags=["Rounds"])
+async def submit_update(request: Request):
+    """Endpoint for clients to submit training updates.
+
+    This endpoint validates the incoming JSON payload for structure and
+    tensor-only payloads (note: JSON cannot carry torch.Tensors, so this
+    endpoint primarily guards against raw lists/numpy-like payloads and
+    unexpected keys).
+    """
+    payload = await request.json()
+
+    allowed = ("client_id", "delta", "num_samples", "metrics", "round_id")
+    res = validate_message(payload, allowed_root_keys=allowed)
+    if not res.valid:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=res.errors)
+
+    return {"message": "Update accepted"}
