@@ -1,4 +1,12 @@
-from .app import app, FLServer
+# Server module - imports with optional FastAPI dependency
+try:
+    from .app import app, FLServer
+    _HAS_FASTAPI = True
+except ImportError:
+    app = None
+    FLServer = None
+    _HAS_FASTAPI = False
+
 from .aggregator import (
     fedavg_aggregate,
     apply_delta,

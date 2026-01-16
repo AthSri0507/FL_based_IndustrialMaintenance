@@ -53,4 +53,5 @@ requirements.md
 #Remove later
 
 docs/
-notebooks/
+*.png
+*.csv

@@ -1,0 +1,200 @@
+{
+  "timestamp": "2026-01-17T00:18:43.646597",
+  "config": {
+    "experiment_name": "federated_rul_evaluation",
+    "seed": 42,
+    "num_clients": 5,
+    "num_rounds": 15,
+    "clients_per_round": 3,
+    "input_channels": 14,
+    "sequence_length": 50,
+    "hidden_channels": 32,
+    "num_levels": 3,
+    "local_epochs": 3,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "samples_per_client": 500,
+    "val_split": 0.2
+  },
+  "federated": {
+    "final_mae": 9.717900276184082,
+    "final_rmse": 12.60557746887207,
+    "best_mae": 9.717900276184082,
+    "best_mae_round": 15
+  },
+  "centralized": {
+    "final_mae": 9.77372932434082,
+    "final_rmse": 12.110771179199219
+  },
+  "local_avg": {
+    "mae": 12.735662460327148,
+    "rmse": 16.36342430114746
+  },
+  "round_metrics": [
+    {
+      "round_id": 1,
+      "global_mae": 49.440155029296875,
+      "global_rmse": 60.33669662475586,
+      "avg_client_loss": 3681.1609700520835,
+      "participants": [
+        0,
+        4,
+        2
+      ]
+    },
+    {
+      "round_id": 2,
+      "global_mae": 43.51163864135742,
+      "global_rmse": 54.277767181396484,
+      "avg_client_loss": 2736.4249674479165,
+      "participants": [
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "round_id": 3,
+      "global_mae": 37.3265266418457,
+      "global_rmse": 46.7290153503418,
+      "avg_client_loss": 1991.6717122395833,
+      "participants": [
+        1,
+        0,
+        2
+      ]
+    },
+    {
+      "round_id": 4,
+      "global_mae": 32.7458381652832,
+      "global_rmse": 39.901390075683594,
+      "avg_client_loss": 1514.4685872395833,
+      "participants": [
+        4,
+        0,
+        2
+      ]
+    },
+    {
+      "round_id": 5,
+      "global_mae": 31.01335906982422,
+      "global_rmse": 36.75184631347656,
+      "avg_client_loss": 1264.4120686848958,
+      "participants": [
+        3,
+        0,
+        4
+      ]
+    },
+    {
+      "round_id": 6,
+      "global_mae": 30.218843460083008,
+      "global_rmse": 35.768489837646484,
+      "avg_client_loss": 1216.1735432942708,
+      "participants": [
+        0,
+        1,
+        4
+      ]
+    },
+    {
+      "round_id": 7,
+      "global_mae": 26.32668113708496,
+      "global_rmse": 31.713855743408203,
+      "avg_client_loss": 880.3591512044271,
+      "participants": [
+        4,
+        0,
+        2
+      ]
+    },
+    {
+      "round_id": 8,
+      "global_mae": 17.68630599975586,
+      "global_rmse": 22.272130966186523,
+      "avg_client_loss": 395.1568603515625,
+      "participants": [
+        1,
+        3,
+        0
+      ]
+    },
+    {
+      "round_id": 9,
+      "global_mae": 13.077162742614746,
+      "global_rmse": 16.392333984375,
+      "avg_client_loss": 247.91898091634116,
+      "participants": [
+        3,
+        2,
+        0
+      ]
+    },
+    {
+      "round_id": 10,
+      "global_mae": 11.32391357421875,
+      "global_rmse": 14.360610961914062,
+      "avg_client_loss": 213.0505167643229,
+      "participants": [
+        1,
+        3,
+        4
+      ]
+    },
+    {
+      "round_id": 11,
+      "global_mae": 11.051223754882812,
+      "global_rmse": 13.983780860900879,
+      "avg_client_loss": 222.90892537434897,
+      "participants": [
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "round_id": 12,
+      "global_mae": 10.505195617675781,
+      "global_rmse": 13.389175415039062,
+      "avg_client_loss": 187.92925516764322,
+      "participants": [
+        2,
+        0,
+        3
+      ]
+    },
+    {
+      "round_id": 13,
+      "global_mae": 10.534346580505371,
+      "global_rmse": 13.427577018737793,
+      "avg_client_loss": 169.6398671468099,
+      "participants": [
+        3,
+        0,
+        1
+      ]
+    },
+    {
+      "round_id": 14,
+      "global_mae": 10.217252731323242,
+      "global_rmse": 13.073854446411133,
+      "avg_client_loss": 204.56380208333334,
+      "participants": [
+        2,
+        4,
+        0
+      ]
+    },
+    {
+      "round_id": 15,
+      "global_mae": 9.717900276184082,
+      "global_rmse": 12.60557746887207,
+      "avg_client_loss": 155.3959757486979,
+      "participants": [
+        3,
+        0,
+        1
+      ]
+    }
+  ]
+}
