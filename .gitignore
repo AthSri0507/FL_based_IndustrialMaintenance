@@ -10,10 +10,10 @@ data/**
 !data/.gitkeep
 
 # Experiments & logs
-experiments/**
+
 logs/
 runs/
-
+experiments/outputs/
 # Model checkpoints
 *.pt
 *.pth
@@ -51,6 +51,6 @@ projectplan.md
 requirements.md
 
 #Remove later
-scripts/
+
 docs/
 notebooks/

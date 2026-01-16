@@ -1,0 +1,47 @@
+# Centralized Training Pipeline Configuration
+# This config defines defaults for the centralized baseline experiment
+
+# Data settings
+data_dir: "data/raw"
+data_files: []  # Leave empty to load all files in data_dir
+window_size: 50  # Sliding window length W
+hop_size: 10  # Hop between windows H
+normalize_windows: true
+val_split: 0.2  # Fraction of data for validation
+test_split: 0.1  # Fraction of data for testing
+
+# Task settings
+task: "rul"  # Options: "rul", "classification"
+num_classes: 2  # Only used for classification task
+
+# Model architecture (TCN-based)
+num_layers: 4
+hidden_dim: 64
+kernel_size: 3
+dropout: 0.2
+fc_hidden: 32
+
+# Training settings
+epochs: 50
+batch_size: 32
+lr: 0.001
+weight_decay: 0.0001
+optimizer: "adam"  # Options: "adam", "sgd", "adamw"
+lr_scheduler: "plateau"  # Options: "none", "step", "cosine", "plateau"
+lr_step_size: 10  # For step scheduler
+lr_gamma: 0.5  # LR decay factor
+early_stopping_patience: 10
+early_stopping_min_delta: 0.0001
+
+# Reproducibility
+seed: 42
+deterministic: true
+
+# Checkpointing and logging
+output_dir: "experiments/outputs/centralized"
+checkpoint_every: 5  # Save checkpoint every N epochs
+log_every: 1  # Log batch metrics (0 = per epoch only)
+save_best: true
+
+# Hardware
+device: "auto"  # Options: "auto", "cuda", "cpu"

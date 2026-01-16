@@ -1,0 +1,94 @@
+# Federated Experiments Matrix Configuration
+# ============================================
+# This configuration defines the experiment matrix for systematic FL evaluation.
+# 
+# Usage:
+#   python -m experiments.federated_matrix --config configs/federated_matrix.yaml
+
+# Output directory for all experiment results
+output_dir: "experiments/outputs/federated_matrix"
+
+# Matrix dimensions to vary
+# Each combination creates a separate experiment
+participation_fractions:
+  - 0.3    # Low participation (30% of clients per round)
+  - 0.5    # Medium participation
+  - 1.0    # Full participation
+
+heterogeneity_modes:
+  - uniform    # IID: equal distribution across clients
+  - dirichlet  # Non-IID: Dirichlet-based heterogeneous distribution
+  # - extreme  # Extreme non-IID: highly imbalanced
+
+local_epochs_list:
+  - 1      # Minimal local training
+  - 5      # Moderate local training
+  - 10     # Extended local training
+
+# Dirichlet alpha values (only used when heterogeneity_mode is "dirichlet")
+# Lower alpha = more heterogeneous
+dirichlet_alphas:
+  - 0.5    # Moderate heterogeneity
+
+# Base configuration applied to all experiments
+base_config:
+  # Experiment metadata
+  experiment_name: "federated_rul_prediction"
+  
+  # Data settings
+  data_dir: "data/raw"
+  window_size: 50
+  hop_size: 10
+  normalize_windows: true
+  global_test_split: 0.15
+  
+  # Client settings
+  num_clients: 10
+  
+  # Task: "rul" for remaining useful life or "classification"
+  task: "rul"
+  num_classes: 2  # Only used for classification task
+  
+  # Model architecture (TCN-based)
+  num_layers: 4
+  hidden_dim: 64
+  kernel_size: 3
+  dropout: 0.2
+  fc_hidden: 32
+  
+  # Federated learning settings
+  num_rounds: 50
+  batch_size: 16
+  lr: 0.001
+  weight_decay: 0.0001
+  optimizer: "adam"
+  
+  # Client training settings
+  early_stopping_enabled: true
+  early_stopping_patience: 3
+  normalize_rul: true
+  rul_max: null  # Auto-detect from data
+  
+  # Evaluation settings
+  eval_every: 5
+  checkpoint_every: 10
+  
+  # Reproducibility
+  seed: 42
+  deterministic: true
+  
+  # Output
+  save_checkpoints: true
+  
+  # Hardware
+  device: "auto"  # "cuda", "cpu", or "auto"
+  
+  # Privacy settings (Differential Privacy)
+  enable_dp: false
+  dp_epsilon: 1.0
+  dp_delta: 0.00001
+  dp_max_grad_norm: 1.0
+  
+  # Compression settings (Gradient Compression)
+  enable_compression: false
+  compression_ratio: 0.1
