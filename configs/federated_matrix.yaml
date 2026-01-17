@@ -35,7 +35,10 @@ base_config:
   # Experiment metadata
   experiment_name: "federated_rul_prediction"
   
-  # Data profile: "clean" for existing behavior, "non_iid_hard" for stress testing
+  # Data profile: "clean" | "non_iid_mild" | "non_iid_hard"
+  #   - clean: IID data (default, existing behavior)
+  #   - non_iid_mild: Moderate heterogeneity (realistic industrial conditions)
+  #   - non_iid_hard: Extreme heterogeneity (stress testing)
   # NOTE: Changing data_profile ONLY affects data generation.
   # It does NOT alter: training loops, model architecture, aggregation,
   # metrics, logging, or random seed handling.
@@ -98,3 +101,9 @@ base_config:
   # Compression settings (Gradient Compression)
   enable_compression: false
   compression_ratio: 0.1
+  
+  # Algorithm selection
+  # "fedavg": Standard FedAvg (default, unchanged behavior)
+  # "fedprox": FedProx with proximal regularization
+  algorithm: "fedavg"
+  fedprox_mu: 0.01  # Proximal term coefficient (only used when algorithm="fedprox")

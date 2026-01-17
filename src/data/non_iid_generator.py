@@ -485,3 +485,208 @@ def get_data_profile_stats(client_data: List[Tuple[np.ndarray, np.ndarray]]) -> 
         stats[f"client_{client_id}"] = client_stats
     
     return stats
+
+
+# =============================================================================
+# NON-IID MILD MODE CONFIGURATION
+# =============================================================================
+# Moderate heterogeneity - between "clean" (IID) and "non_iid_hard" (extreme)
+# 
+# Key differences from non_iid_hard:
+# - Overlapping (not disjoint) RUL ranges
+# - Smaller noise/bias variations
+# - Less extreme quantity imbalance
+# - No concept drift
+
+# -- Mild Label Skew Configuration --
+# RUL ranges overlap significantly (unlike hard mode's disjoint ranges)
+MILD_CLIENT_RUL_RANGES: Dict[int, Tuple[int, int]] = {
+    0: (0, 70),    # Low-to-mid RUL
+    1: (20, 90),   # Mid RUL
+    2: (10, 80),   # Low-to-mid-high RUL
+    3: (0, 100),   # Full range (baseline)
+    4: (30, 100),  # Mid-to-high RUL
+}
+
+# -- Mild Feature Skew Configuration --
+# Moderate noise levels (less extreme than hard mode)
+MILD_CLIENT_NOISE: Dict[int, float] = {
+    0: 0.05,   # Low noise
+    1: 0.15,   # Medium noise
+    2: 0.10,   # Low-medium noise
+    3: 0.20,   # Medium-high noise
+    4: 0.08,   # Low noise
+}
+
+# Moderate bias levels (less extreme than hard mode)
+MILD_CLIENT_BIAS: Dict[int, float] = {
+    0: 0.0,    # No bias
+    1: 0.5,    # Small positive bias
+    2: -0.5,   # Small negative bias
+    3: 1.0,    # Moderate positive bias
+    4: -1.0,   # Moderate negative bias
+}
+
+# -- Mild Quantity Skew Configuration --
+# Moderate imbalance (less extreme than hard mode)
+MILD_CLIENT_DATA_SIZES: Dict[int, int] = {
+    0: 400,
+    1: 300,
+    2: 250,
+    3: 200,
+    4: 150,
+}
+
+
+def _sample_mild_rul_for_client(
+    client_id: int,
+    n_samples: int,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    """Sample RUL values for a client using mild label skew.
+    
+    Unlike hard mode, RUL ranges overlap significantly.
+    """
+    rul_min, rul_max = MILD_CLIENT_RUL_RANGES.get(client_id, (0, 100))
+    return rng.uniform(rul_min, rul_max, size=n_samples)
+
+
+def _get_mild_client_noise(client_id: int) -> float:
+    """Get noise level for mild profile."""
+    return MILD_CLIENT_NOISE.get(client_id, 0.1)
+
+
+def _get_mild_client_bias(client_id: int) -> float:
+    """Get bias level for mild profile."""
+    return MILD_CLIENT_BIAS.get(client_id, 0.0)
+
+
+def _get_mild_client_sample_count(client_id: int) -> int:
+    """Get sample count for mild profile."""
+    return MILD_CLIENT_DATA_SIZES.get(client_id, 250)
+
+
+def _apply_mild_feature_skew(
+    X: np.ndarray,
+    client_id: int,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    """Apply mild feature skew (noise + bias) to client data."""
+    noise_level = _get_mild_client_noise(client_id)
+    bias = _get_mild_client_bias(client_id)
+    
+    noise = rng.normal(0, noise_level, size=X.shape)
+    X_skewed = X + noise + bias
+    
+    return X_skewed
+
+
+def generate_non_iid_mild_data(
+    num_clients: int = 5,
+    seq_length: int = 100,
+    num_channels: int = 14,
+    task: str = "rul",
+    num_classes: int = 2,
+    seed: Optional[int] = None,
+) -> List[Tuple[np.ndarray, np.ndarray]]:
+    """Generate non-IID mild heterogeneous data for FL stress testing.
+    
+    This creates a moderately heterogeneous dataset that sits between
+    clean (IID) and non_iid_hard (extreme heterogeneity).
+    
+    Heterogeneity dimensions:
+    - Label skew: Overlapping but shifted RUL ranges
+    - Feature skew: Moderate noise/bias variations
+    - Quantity skew: Moderate data size imbalance
+    - NO concept drift (unlike hard mode)
+    
+    Args:
+        num_clients: Number of clients to generate data for
+        seq_length: Length of each time series sequence
+        num_channels: Number of sensor channels
+        task: Task type ("rul" or "classification")
+        num_classes: Number of classes (only used for classification task)
+        seed: Random seed for reproducibility
+        
+    Returns:
+        List of (X, y) tuples, one per client
+    """
+    rng = np.random.default_rng(seed)
+    client_data = []
+    
+    for client_id in range(num_clients):
+        # Get client-specific sample count
+        n_samples = _get_mild_client_sample_count(client_id)
+        
+        # Generate RUL values with mild label skew (overlapping ranges)
+        y = _sample_mild_rul_for_client(client_id, n_samples, rng)
+        
+        # Generate base features (use client_id as part of seed for reproducibility)
+        client_seed = seed + client_id if seed is not None else None
+        X = generate_synthetic_features(
+            n_samples=n_samples,
+            seq_length=seq_length,
+            num_channels=num_channels,
+            seed=client_seed,
+        )
+        
+        # Apply mild feature skew (smaller noise/bias)
+        X = _apply_mild_feature_skew(X, client_id, rng)
+        
+        client_data.append((X, y))
+    
+    return client_data
+
+
+def generate_non_iid_mild_centralized(
+    num_clients: int = 5,
+    seq_length: int = 100,
+    num_channels: int = 14,
+    task: str = "rul",
+    seed: Optional[int] = None,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """Generate centralized version of non-IID mild data.
+    
+    Generates data as if it came from multiple heterogeneous sources,
+    then merges it for centralized training baseline.
+    """
+    client_data = generate_non_iid_mild_data(
+        num_clients=num_clients,
+        seq_length=seq_length,
+        num_channels=num_channels,
+        task=task,
+        seed=seed,
+    )
+    
+    all_X = np.concatenate([X for X, y in client_data], axis=0)
+    all_y = np.concatenate([y for X, y in client_data], axis=0)
+    
+    return all_X, all_y
+
+
+def get_mild_data_profile_stats(client_data: List[Tuple[np.ndarray, np.ndarray]]) -> Dict:
+    """Compute statistics for mild profile data.
+    
+    Args:
+        client_data: List of (X, y) tuples from generate_non_iid_mild_data
+        
+    Returns:
+        Dictionary with per-client statistics
+    """
+    stats = {}
+    
+    for client_id, (X, y) in enumerate(client_data):
+        client_stats = {
+            "n_samples": len(X),
+            "y_min": float(y.min()),
+            "y_max": float(y.max()),
+            "y_mean": float(y.mean()),
+            "y_std": float(y.std()),
+            "X_mean": float(X.mean()),
+            "X_std": float(X.std()),
+            "feature_bias": _get_mild_client_bias(client_id),
+            "feature_noise": _get_mild_client_noise(client_id),
+        }
+        stats[f"client_{client_id}"] = client_stats
+    
+    return stats

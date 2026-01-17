@@ -141,6 +141,12 @@ class FederatedExperimentConfig:
     enable_compression: bool = False
     compression_ratio: float = 0.1  # Keep top 10% of gradients
     
+    # Federated learning algorithm selection
+    # "fedavg": Standard FedAvg (default, unchanged behavior)
+    # "fedprox": FedProx with proximal regularization
+    algorithm: str = "fedavg"
+    fedprox_mu: float = 0.01  # Proximal term coefficient (only used when algorithm="fedprox")
+    
     # Evaluation settings
     eval_every: int = 5  # Evaluate global model every N rounds
     checkpoint_every: int = 10
@@ -159,6 +165,15 @@ class FederatedExperimentConfig:
     def __post_init__(self):
         if self.device == "auto":
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        
+        # SCIENTIFIC VALIDITY: Prevent double heterogeneity
+        # non_iid_hard and non_iid_mild profiles already include: label skew, feature skew, quantity skew
+        # Adding Dirichlet partitioning on top destroys data coherence
+        if self.data_profile in ["non_iid_hard", "non_iid_mild"] and self.heterogeneity_mode != "uniform":
+            logger.info(f"{self.data_profile} profile detected → forcing heterogeneity_mode = uniform")
+            logger.info("Dirichlet partitioning disabled for scientific validity")
+            self.heterogeneity_mode = "uniform"
+        
         if not self.experiment_id:
             self.experiment_id = f"{self.heterogeneity_mode}_pf{self.participation_fraction}_le{self.local_epochs}"
 
@@ -225,6 +240,8 @@ class ExperimentMatrixConfig:
                     dp_max_grad_norm=self.base_config.dp_max_grad_norm,
                     enable_compression=self.base_config.enable_compression,
                     compression_ratio=self.base_config.compression_ratio,
+                    algorithm=self.base_config.algorithm,
+                    fedprox_mu=self.base_config.fedprox_mu,
                     eval_every=self.base_config.eval_every,
                     checkpoint_every=self.base_config.checkpoint_every,
                     seed=self.base_config.seed,
@@ -555,12 +572,88 @@ class FederatedExperiment:
         self._setup()
         
         # =================================================================
-        # NON-IID HARD MODE DATA DISPATCH
+        # NON-IID DATA PROFILE DISPATCH
         # NOTE: This ONLY affects data generation/partitioning.
         # Training loops, model architecture, aggregation, metrics,
         # logging, and random seed handling remain COMPLETELY UNCHANGED.
         # =================================================================
-        if self.config.data_profile == "non_iid_hard":
+        if self.config.data_profile == "non_iid_mild":
+            from src.data.non_iid_generator import generate_non_iid_mild_data
+            
+            logger.info("Using NON-IID MILD data profile")
+            logger.info("  - Label skew: overlapping RUL distributions")
+            logger.info("  - Feature skew: moderate noise/bias")
+            logger.info("  - Quantity skew: moderate imbalance")
+            
+            # Generate pre-partitioned heterogeneous data
+            client_partitions = generate_non_iid_mild_data(
+                num_clients=self.config.num_clients,
+                seq_length=100,  # Fixed for synthetic data
+                num_channels=14,  # Fixed for synthetic data
+                task=self.config.task,
+                num_classes=self.config.num_classes,
+                seed=self.config.seed,
+            )
+            
+            # Create merged dataset for global operations (test split, normalization)
+            all_X = np.concatenate([X_c for X_c, y_c in client_partitions], axis=0)
+            all_y = np.concatenate([y_c for X_c, y_c in client_partitions], axis=0)
+            
+            logger.info(f"Total data shape: {all_X.shape}")
+            
+            # Hold out global test set (from merged data)
+            X_train, y_train, X_test, y_test = self._split_test(all_X, all_y)
+            
+            # Auto-detect RUL scale for normalization
+            if self.config.task == "rul" and self.config.normalize_rul:
+                if self.config.rul_max is not None:
+                    self.rul_scale = float(self.config.rul_max)
+                else:
+                    self.rul_scale = float(y_train.max())
+            
+            # Normalize test targets for evaluation
+            if self.config.task == "rul" and self.config.normalize_rul:
+                y_test_normalized = y_test / self.rul_scale
+            else:
+                y_test_normalized = y_test
+            
+            self.global_test_data = (
+                torch.tensor(X_test, dtype=torch.float32),
+                torch.tensor(
+                    y_test_normalized,
+                    dtype=torch.float32 if self.config.task == "rul" else torch.long
+                ),
+            )
+            
+            # Re-generate client partitions excluding test indices
+            test_fraction = self.config.global_test_split
+            train_partitions = []
+            for client_id, (X_c, y_c) in enumerate(client_partitions):
+                n_train = int(len(X_c) * (1 - test_fraction))
+                train_partitions.append((X_c[:n_train], y_c[:n_train]))
+            
+            client_partitions = train_partitions
+            
+            # Log data distribution
+            logger.info(f"Partitioned data across {len(client_partitions)} clients (non_iid_mild)")
+            for i, (X_c, y_c) in enumerate(client_partitions):
+                if self.config.task == "rul":
+                    logger.info(f"  Client {i}: {len(X_c)} samples, RUL: [{y_c.min():.1f}, {y_c.max():.1f}]")
+                else:
+                    logger.info(f"  Client {i}: {len(X_c)} samples")
+            
+            # Initialize client trainers
+            self._init_clients(client_partitions)
+            
+            # Initialize global model
+            num_channels = client_partitions[0][0].shape[2]
+            self.global_model = create_model(self.config.task, num_channels, self.config)
+            self.global_model.to(self.config.device)
+            
+            # Run federated training
+            return self._run_federated_training()
+        
+        elif self.config.data_profile == "non_iid_hard":
             from src.data.non_iid_generator import generate_non_iid_hard_data
             
             logger.info("Using NON-IID HARD data profile")
@@ -832,6 +925,9 @@ class FederatedExperiment:
                 rul_max=self.rul_scale if self.config.normalize_rul else None,
                 seed=self.config.seed + client_id if self.config.seed else None,
                 device=self.config.device,
+                # Algorithm selection: fedavg or fedprox
+                algorithm=self.config.algorithm,
+                fedprox_mu=self.config.fedprox_mu,
             )
             
             trainer = SimulatedClientTrainer(
@@ -852,6 +948,9 @@ class FederatedExperiment:
         """Execute federated training rounds."""
         logger.info("=" * 60)
         logger.info(f"Starting Federated Training: {self.config.experiment_id}")
+        logger.info(f"  Algorithm: {self.config.algorithm.upper()}")
+        if self.config.algorithm == "fedprox":
+            logger.info(f"  FedProx mu: {self.config.fedprox_mu}")
         logger.info(f"  Rounds: {self.config.num_rounds}")
         logger.info(f"  Clients: {self.config.num_clients}")
         logger.info(f"  Participation: {self.config.participation_fraction:.0%}")
@@ -1387,6 +1486,21 @@ def parse_args() -> argparse.Namespace:
         help="Run single experiment instead of matrix",
     )
     
+    # Algorithm selection (FedAvg or FedProx)
+    parser.add_argument(
+        "--algorithm",
+        type=str,
+        choices=["fedavg", "fedprox"],
+        default=None,
+        help="FL algorithm: 'fedavg' (default) or 'fedprox'",
+    )
+    parser.add_argument(
+        "--fedprox-mu",
+        type=float,
+        default=None,
+        help="FedProx proximal term coefficient (only used when algorithm='fedprox')",
+    )
+    
     return parser.parse_args()
 
 
@@ -1420,6 +1534,12 @@ def main():
         config.base_config.lr = args.lr
     if args.seed:
         config.base_config.seed = args.seed
+    
+    # Algorithm overrides
+    if args.algorithm:
+        config.base_config.algorithm = args.algorithm
+    if args.fedprox_mu is not None:
+        config.base_config.fedprox_mu = args.fedprox_mu
     
     # Run
     if args.single_experiment:

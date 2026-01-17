@@ -100,6 +100,12 @@ class ClientConfig:
     # Multi-task weights (for MULTI_TASK mode)
     rul_weight: float = 1.0
     classification_weight: float = 1.0
+    
+    # Federated learning algorithm selection
+    # "fedavg": Standard FedAvg (default, unchanged behavior)
+    # "fedprox": FedProx with proximal regularization
+    algorithm: str = "fedavg"
+    fedprox_mu: float = 0.01  # Proximal term coefficient (only used when algorithm="fedprox")
 
 
 # ---------------------- Metrics Functions ----------------------
@@ -684,8 +690,18 @@ class SimulatedClientTrainer:
         optimizer: torch.optim.Optimizer,
         loss_fn: Callable,
         device: str,
+        global_weights: Optional[Dict[str, torch.Tensor]] = None,
     ) -> Tuple[float, Dict[str, float]]:
         """Train for one epoch.
+        
+        Args:
+            model: Local model to train
+            train_loader: Training data loader
+            optimizer: Optimizer instance
+            loss_fn: Loss function
+            device: Device to train on
+            global_weights: Global model weights for FedProx proximal term.
+                           Only used when config.algorithm == "fedprox".
         
         Returns:
             avg_loss, metrics_dict
@@ -716,6 +732,17 @@ class SimulatedClientTrainer:
                 if outputs.dim() == 1:
                     outputs = outputs.unsqueeze(0)
                 loss = loss_fn(outputs, y_batch.long())
+            
+            # FedProx: Add proximal term when algorithm == "fedprox"
+            # L_total = L_local + (mu / 2) * ||w_client - w_global||^2
+            # This regularizes local updates to stay close to global model
+            if self.config.algorithm == "fedprox" and global_weights is not None:
+                prox_term = 0.0
+                for name, param in model.named_parameters():
+                    if name in global_weights:
+                        global_param = global_weights[name].to(device)
+                        prox_term += torch.norm(param - global_param) ** 2
+                loss = loss + (self.config.fedprox_mu / 2.0) * prox_term
             
             loss.backward()
             optimizer.step()
@@ -891,6 +918,15 @@ class SimulatedClientTrainer:
             # Create data loaders
             train_loader, val_loader = self._create_data_loaders()
             
+            # For FedProx: store global model weights (detached, on device)
+            # This is only used when algorithm == "fedprox"
+            global_weights = None
+            if self.config.algorithm == "fedprox":
+                global_weights = {
+                    name: param.detach().clone().to(device)
+                    for name, param in model.named_parameters()
+                }
+            
             # Training loop with early stopping
             best_val_loss = float("inf")
             patience_counter = 0
@@ -899,8 +935,10 @@ class SimulatedClientTrainer:
             
             for epoch in range(effective_epochs):
                 # Train one epoch
+                # Pass global_weights for FedProx proximal term (None for FedAvg)
                 train_loss, train_metrics = self._train_one_epoch(
-                    local_model, train_loader, optimizer, loss_fn, device
+                    local_model, train_loader, optimizer, loss_fn, device,
+                    global_weights=global_weights
                 )
                 
                 # Validate

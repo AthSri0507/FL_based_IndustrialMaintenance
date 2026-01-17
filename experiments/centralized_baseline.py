@@ -938,12 +938,29 @@ def main():
         config.seed = args.seed
 
     # =================================================================
-    # NON-IID HARD MODE DATA DISPATCH
+    # NON-IID DATA PROFILE DISPATCH
     # NOTE: This ONLY affects data generation.
     # Training loops, model architecture, metrics, logging, and random 
     # seed handling remain COMPLETELY UNCHANGED.
     # =================================================================
-    if config.data_profile == "non_iid_hard":
+    if config.data_profile == "non_iid_mild":
+        from src.data.non_iid_generator import generate_non_iid_mild_centralized
+        
+        print("Using NON-IID MILD data profile (centralized)")
+        print("  - Merging moderately heterogeneous client data for centralized training")
+        
+        X, y = generate_non_iid_mild_centralized(
+            num_clients=5,  # Default number of clients
+            seq_length=100,
+            num_channels=14,
+            task=config.task,
+            num_classes=config.num_classes,
+            seed=config.seed,
+        )
+        num_channels = X.shape[2]
+        print(f"Data shape: X={X.shape}, y={y.shape}")
+        print(f"Number of channels: {num_channels}")
+    elif config.data_profile == "non_iid_hard":
         from src.data.non_iid_generator import generate_non_iid_hard_centralized
         
         print("Using NON-IID HARD data profile (centralized)")
@@ -961,7 +978,7 @@ def main():
         print(f"Data shape: X={X.shape}, y={y.shape}")
         print(f"Number of channels: {num_channels}")
     # =================================================================
-    # END NON-IID HARD MODE DATA DISPATCH
+    # END NON-IID DATA PROFILE DISPATCH
     # =================================================================
     # =================================================================
     # CLEAN MODE (DEFAULT) - EXISTING BEHAVIOR UNCHANGED

@@ -1,0 +1,130 @@
+# FedProx Privacy-Utility Tradeoff Experiments
+# =============================================
+# This configuration defines experiments comparing FedAvg vs FedProx
+# under varying differential privacy budgets (epsilon).
+#
+# Experiment Matrix:
+#   - FedAvg-weakDP:    algorithm=fedavg, dp_epsilon=38, fedprox_mu=0
+#   - FedAvg-strongDP:  algorithm=fedavg, dp_epsilon=10, fedprox_mu=0
+#   - FedProx-strongDP: algorithm=fedprox, dp_epsilon=10, fedprox_mu=0.01
+#   - FedProx-midDP:    algorithm=fedprox, dp_epsilon=8, fedprox_mu=0.02
+#   - FedProx-tightDP:  algorithm=fedprox, dp_epsilon=6, fedprox_mu=0.05
+#
+# Usage:
+#   python -m experiments.federated_matrix --config configs/fedprox_privacy_experiments.yaml
+
+output_dir: "experiments/outputs/fedprox_privacy_tradeoff"
+
+# We define 5 specific experiments (not a matrix), each configured individually
+# Since the matrix framework varies certain dimensions, we use it with single values
+# and run experiments separately or via the notebook
+
+# Base configuration for all experiments
+base_config:
+  experiment_name: "fedprox_privacy_tradeoff"
+  
+  # Data settings
+  data_dir: "data/raw"
+  window_size: 50
+  hop_size: 10
+  normalize_windows: true
+  global_test_split: 0.15
+  data_profile: "non_iid_hard"  # Use non-IID hard for challenging heterogeneity
+  
+  # Client settings
+  num_clients: 10
+  
+  # Task
+  task: "rul"
+  num_classes: 2
+  
+  # Model architecture (TCN-based)
+  num_layers: 4
+  hidden_dim: 64
+  kernel_size: 3
+  dropout: 0.2
+  fc_hidden: 32
+  
+  # Federated learning settings
+  num_rounds: 30
+  batch_size: 16
+  lr: 0.001
+  weight_decay: 0.0001
+  optimizer: "adam"
+  
+  # Client training settings
+  local_epochs: 5
+  early_stopping_enabled: true
+  early_stopping_patience: 3
+  normalize_rul: true
+  rul_max: null
+  
+  # Default algorithm (will be overridden per experiment)
+  algorithm: "fedavg"
+  fedprox_mu: 0.0
+  
+  # Privacy settings - enabled by default
+  enable_dp: true
+  dp_epsilon: 10.0
+  dp_delta: 0.00001
+  dp_max_grad_norm: 1.0
+  
+  # Compression
+  enable_compression: false
+  compression_ratio: 0.1
+  
+  # Evaluation
+  eval_every: 5
+  checkpoint_every: 10
+  
+  # Reproducibility
+  seed: 42
+  deterministic: true
+  
+  # Output
+  save_checkpoints: true
+  
+  # Hardware
+  device: "auto"
+
+# Matrix dimensions (minimal for running single configs via notebook)
+participation_fractions:
+  - 1.0
+
+heterogeneity_modes:
+  - dirichlet
+
+local_epochs_list:
+  - 5
+
+dirichlet_alphas:
+  - 0.3  # Non-IID setting
+
+# ==========================================================================
+# Experiment-Specific Configurations (to be run individually or via notebook)
+# ==========================================================================
+# 
+# Experiment 1: FedAvg-weakDP
+#   algorithm: fedavg
+#   dp_epsilon: 38
+#   fedprox_mu: 0
+#
+# Experiment 2: FedAvg-strongDP
+#   algorithm: fedavg
+#   dp_epsilon: 10
+#   fedprox_mu: 0
+#
+# Experiment 3: FedProx-strongDP
+#   algorithm: fedprox
+#   dp_epsilon: 10
+#   fedprox_mu: 0.01
+#
+# Experiment 4: FedProx-midDP
+#   algorithm: fedprox
+#   dp_epsilon: 8
+#   fedprox_mu: 0.02
+#
+# Experiment 5: FedProx-tightDP
+#   algorithm: fedprox
+#   dp_epsilon: 6
+#   fedprox_mu: 0.05

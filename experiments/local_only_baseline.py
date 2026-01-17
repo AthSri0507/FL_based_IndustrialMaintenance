@@ -127,6 +127,11 @@ class LocalOnlyConfig:
     def __post_init__(self):
         if self.device == "auto":
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        
+        # SCIENTIFIC VALIDITY: Prevent double heterogeneity
+        # non_iid_hard and non_iid_mild profiles already include their own heterogeneity
+        if self.data_profile in ["non_iid_hard", "non_iid_mild"] and self.heterogeneity_mode != "uniform":
+            self.heterogeneity_mode = "uniform"
 
 
 def load_config(config_path: Optional[str] = None) -> LocalOnlyConfig:
@@ -665,12 +670,69 @@ class LocalOnlyBaseline:
         logger.info(f"Configuration: {asdict(self.config)}")
 
         # =================================================================
-        # NON-IID HARD MODE DATA DISPATCH
+        # NON-IID DATA PROFILE DISPATCH
         # NOTE: This ONLY affects data generation/partitioning.
         # Training loops, model architecture, metrics, logging, and random 
         # seed handling remain COMPLETELY UNCHANGED.
         # =================================================================
-        if self.config.data_profile == "non_iid_hard":
+        if self.config.data_profile == "non_iid_mild":
+            from src.data.non_iid_generator import generate_non_iid_mild_data
+            
+            logger.info("Using NON-IID MILD data profile")
+            logger.info("  - Label skew: overlapping RUL distributions")
+            logger.info("  - Feature skew: moderate noise/bias")
+            logger.info("  - Quantity skew: moderate imbalance")
+            
+            # Generate pre-partitioned heterogeneous data
+            client_partitions = generate_non_iid_mild_data(
+                num_clients=self.config.num_clients,
+                seq_length=100,
+                num_channels=14,
+                task=self.config.task,
+                num_classes=self.config.num_classes,
+                seed=self.config.seed,
+            )
+            
+            # Create merged dataset for global test set
+            all_X = np.concatenate([X_c for X_c, y_c in client_partitions], axis=0)
+            all_y = np.concatenate([y_c for X_c, y_c in client_partitions], axis=0)
+            
+            logger.info(f"Total data shape: {all_X.shape}")
+            
+            # Hold out global test set
+            X_train_full, y_train_full, X_test_global, y_test_global = self._split_global_test(all_X, all_y)
+            
+            # Convert global test to tensors
+            self.global_test_data = (
+                torch.tensor(X_test_global, dtype=torch.float32),
+                torch.tensor(
+                    y_test_global,
+                    dtype=torch.float32 if self.config.task == "rul" else torch.long
+                ),
+            )
+            
+            logger.info(f"Training data: {len(X_train_full)} samples")
+            logger.info(f"Global test data: {len(X_test_global)} samples")
+            
+            # Re-use pre-partitioned data (proportionally reduce for test split)
+            test_fraction = self.config.global_test_split
+            train_partitions = []
+            for client_id, (X_c, y_c) in enumerate(client_partitions):
+                n_train = int(len(X_c) * (1 - test_fraction))
+                train_partitions.append((X_c[:n_train], y_c[:n_train]))
+            
+            client_partitions = train_partitions
+            num_channels = client_partitions[0][0].shape[2]
+            
+            logger.info(f"\nClient data distribution (non_iid_mild):")
+            for i, (X_c, y_c) in enumerate(client_partitions):
+                if self.config.task == "classification":
+                    pos_frac = np.mean(y_c == 1) if len(y_c) > 0 else 0
+                    logger.info(f"  Client {i}: {len(X_c)} samples, {pos_frac:.1%} positive")
+                else:
+                    logger.info(f"  Client {i}: {len(X_c)} samples, RUL range: [{y_c.min():.1f}, {y_c.max():.1f}]")
+        
+        elif self.config.data_profile == "non_iid_hard":
             from src.data.non_iid_generator import generate_non_iid_hard_data
             
             logger.info("Using NON-IID HARD data profile")
