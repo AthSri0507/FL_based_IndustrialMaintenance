@@ -1,0 +1,316 @@
+{
+  "per_client": [
+    {
+      "client_id": 0,
+      "num_samples": 680,
+      "training": {
+        "client_id": 0,
+        "num_train_samples": 544,
+        "num_val_samples": 136,
+        "epochs_completed": 10,
+        "train_time": 25.938582181930542,
+        "final_train_metrics": {
+          "mse": 85.81910705566406,
+          "mae": 7.827864646911621,
+          "rmse": 9.263860267494543,
+          "score": 641.8670043945312,
+          "loss": 0.09617442988297518
+        },
+        "final_val_metrics": {
+          "mse": 73.40460968017578,
+          "mae": 7.397932529449463,
+          "rmse": 8.567649017097734,
+          "score": 148.6082305908203,
+          "loss": 0.0822619436418309
+        },
+        "rul_scale": 29.871854782104492,
+        "status": "success"
+      },
+      "local_eval": {
+        "mse": 77.5686264038086,
+        "mae": 7.580136299133301,
+        "rmse": 8.8073052861706,
+        "score": 778.5004272460938,
+        "loss": 0.08692840276395573
+      },
+      "global_eval": {
+        "mse": 1067.0062255859375,
+        "mae": 22.14915657043457,
+        "rmse": 32.66506123652514,
+        "score": 11671.8603515625,
+        "loss": 1.1957560904324054
+      }
+    },
+    {
+      "client_id": 1,
+      "num_samples": 170,
+      "training": {
+        "client_id": 1,
+        "num_train_samples": 136,
+        "num_val_samples": 34,
+        "epochs_completed": 12,
+        "train_time": 12.212801456451416,
+        "final_train_metrics": {
+          "mse": 128.7884063720703,
+          "mae": 9.201215744018555,
+          "rmse": 11.348497978678514,
+          "score": 210.25381469726562,
+          "loss": 0.035800568759441376
+        },
+        "final_val_metrics": {
+          "mse": 77.39099884033203,
+          "mae": 7.87830114364624,
+          "rmse": 8.797215402633496,
+          "score": 36.14278793334961,
+          "loss": 0.021513129858409658
+        },
+        "rul_scale": 59.97819900512695,
+        "status": "success"
+      },
+      "local_eval": {
+        "mse": 150.31381225585938,
+        "mae": 10.279645919799805,
+        "rmse": 12.26025335202578,
+        "score": 261.61138916015625,
+        "loss": 0.04178419275318875
+      },
+      "global_eval": {
+        "mse": 753.7594604492188,
+        "mae": 24.477399826049805,
+        "rmse": 27.454680119229558,
+        "score": 3565.75341796875,
+        "loss": 0.209529869556427
+      }
+    },
+    {
+      "client_id": 2,
+      "num_samples": 127,
+      "training": {
+        "client_id": 2,
+        "num_train_samples": 102,
+        "num_val_samples": 25,
+        "epochs_completed": 7,
+        "train_time": 2.333500623703003,
+        "final_train_metrics": {
+          "mse": 834.3060913085938,
+          "mae": 24.66495132446289,
+          "rmse": 28.884357207813952,
+          "score": 814.2828979492188,
+          "loss": 0.08345749229192734
+        },
+        "final_val_metrics": {
+          "mse": 256.2414855957031,
+          "mae": 12.780988693237305,
+          "rmse": 16.007544646063092,
+          "score": 495.3453369140625,
+          "loss": 0.02563240561707347
+        },
+        "rul_scale": 99.98389434814453,
+        "status": "success"
+      },
+      "local_eval": {
+        "mse": 658.7218017578125,
+        "mae": 23.01844024658203,
+        "rmse": 25.665576201554728,
+        "score": 2240.136474609375,
+        "loss": 0.06589340160446842
+      },
+      "global_eval": {
+        "mse": 4199.78955078125,
+        "mae": 59.4941291809082,
+        "rmse": 64.80578331276654,
+        "score": 599664.4375,
+        "loss": 0.42011421839396157
+      }
+    },
+    {
+      "client_id": 3,
+      "num_samples": 42,
+      "training": {
+        "client_id": 3,
+        "num_train_samples": 34,
+        "num_val_samples": 8,
+        "epochs_completed": 10,
+        "train_time": 2.1583261489868164,
+        "final_train_metrics": {
+          "mse": 1464.2647705078125,
+          "mae": 35.72027587890625,
+          "rmse": 38.26571272703296,
+          "score": 1136.8052978515625,
+          "loss": 0.14883436262607574
+        },
+        "final_val_metrics": {
+          "mse": 2620.1591796875,
+          "mae": 49.4599494934082,
+          "rmse": 51.18749046092707,
+          "score": 522.455810546875,
+          "loss": 0.26632457971572876
+        },
+        "rul_scale": 99.18778991699219,
+        "status": "success"
+      },
+      "local_eval": {
+        "mse": 2040.9400634765625,
+        "mae": 40.04349899291992,
+        "rmse": 45.176764641534064,
+        "score": 10190.369140625,
+        "loss": 0.2074501642159053
+      },
+      "global_eval": {
+        "mse": 1020.2348022460938,
+        "mae": 26.453685760498047,
+        "rmse": 31.941114605569005,
+        "score": 8382.4150390625,
+        "loss": 0.10370117531882392
+      }
+    },
+    {
+      "client_id": 4,
+      "num_samples": 255,
+      "training": {
+        "client_id": 4,
+        "num_train_samples": 204,
+        "num_val_samples": 51,
+        "epochs_completed": 6,
+        "train_time": 6.794141054153442,
+        "final_train_metrics": {
+          "mse": 975.8049926757812,
+          "mae": 26.573335647583008,
+          "rmse": 31.237877531544637,
+          "score": 5064.96240234375,
+          "loss": 0.09799222648143768
+        },
+        "final_val_metrics": {
+          "mse": 1020.0565795898438,
+          "mae": 27.114404678344727,
+          "rmse": 31.938324620897756,
+          "score": 963.3787841796875,
+          "loss": 0.10243606465119942
+        },
+        "rul_scale": 99.7896957397461,
+        "status": "success"
+      },
+      "local_eval": {
+        "mse": 1007.3502197265625,
+        "mae": 26.846323013305664,
+        "rmse": 31.73878100568077,
+        "score": 5047.68212890625,
+        "loss": 0.10116006171002108
+      },
+      "global_eval": {
+        "mse": 669.9540405273438,
+        "mae": 22.246105194091797,
+        "rmse": 25.883470411197642,
+        "score": 2938.971435546875,
+        "loss": 0.06727808132767678
+      }
+    }
+  ],
+  "local_metrics": {
+    "mse": {
+      "mean": 786.9789047241211,
+      "std": 713.5877481503035,
+      "min": 77.5686264038086,
+      "max": 2040.9400634765625
+    },
+    "mae": {
+      "mean": 21.553608894348145,
+      "std": 11.784691485257213,
+      "min": 7.580136299133301,
+      "max": 40.04349899291992
+    },
+    "rmse": {
+      "mean": 24.729736097393193,
+      "std": 13.244585960965686,
+      "min": 8.8073052861706,
+      "max": 45.176764641534064
+    },
+    "score": {
+      "mean": 3703.659912109375,
+      "std": 3644.9951778538116,
+      "min": 261.61138916015625,
+      "max": 10190.369140625
+    },
+    "loss": {
+      "mean": 0.10064324460950787,
+      "std": 0.05704037453746441,
+      "min": 0.04178419275318875,
+      "max": 0.2074501642159053
+    }
+  },
+  "global_metrics": {
+    "mse": {
+      "mean": 1542.1488159179687,
+      "std": 1337.422184387136,
+      "min": 669.9540405273438,
+      "max": 4199.78955078125
+    },
+    "mae": {
+      "mean": 30.964095306396484,
+      "std": 14.353329522617894,
+      "min": 22.14915657043457,
+      "max": 59.4941291809082
+    },
+    "rmse": {
+      "mean": 36.55002193705757,
+      "std": 14.361222521727688,
+      "min": 25.883470411197642,
+      "max": 64.80578331276654
+    },
+    "score": {
+      "mean": 125244.68754882812,
+      "std": 237231.58649836815,
+      "min": 2938.971435546875,
+      "max": 599664.4375
+    },
+    "loss": {
+      "mean": 0.3992758870058589,
+      "std": 0.41675063402647755,
+      "min": 0.06727808132767678,
+      "max": 1.1957560904324054
+    }
+  },
+  "total_train_time": 49.43735146522522,
+  "config": {
+    "data_profile": "non_iid_hard",
+    "data_dir": "data/raw",
+    "data_files": [],
+    "window_size": 50,
+    "hop_size": 10,
+    "normalize_windows": true,
+    "global_test_split": 0.15,
+    "num_clients": 5,
+    "heterogeneity_mode": "uniform",
+    "dirichlet_alpha": 0.5,
+    "extreme_imbalance": [
+      0.9,
+      0.7,
+      0.5,
+      0.3,
+      0.1
+    ],
+    "task": "rul",
+    "num_classes": 2,
+    "num_layers": 4,
+    "hidden_dim": 64,
+    "kernel_size": 3,
+    "dropout": 0.2,
+    "fc_hidden": 32,
+    "local_epochs": 45,
+    "batch_size": 32,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "optimizer": "adam",
+    "early_stopping_patience": 5,
+    "early_stopping_min_delta": 0.0001,
+    "normalize_rul": true,
+    "rul_max": null,
+    "seed": 42,
+    "deterministic": true,
+    "output_dir": "experiments/outputs/non_iid_hard_local_only",
+    "save_client_models": false,
+    "compare_centralized": true,
+    "centralized_checkpoint": "",
+    "device": "cpu"
+  }
+}

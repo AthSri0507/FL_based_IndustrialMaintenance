@@ -58,6 +58,12 @@ from src.data.segment import segment_windows
 class CentralizedConfig:
     """Configuration for centralized training pipeline."""
 
+    # Data profile: "clean" for existing behavior, "non_iid_hard" for stress testing
+    # NOTE: Changing data_profile ONLY affects data generation.
+    # It does NOT alter: training loops, model architecture, aggregation,
+    # metrics, logging, or random seed handling.
+    data_profile: str = "clean"
+
     # Data settings
     data_dir: str = "data/raw"
     data_files: List[str] = field(default_factory=list)  # specific files to load
@@ -931,8 +937,36 @@ def main():
     if args.seed:
         config.seed = args.seed
 
-    # Load data
-    if args.synthetic:
+    # =================================================================
+    # NON-IID HARD MODE DATA DISPATCH
+    # NOTE: This ONLY affects data generation.
+    # Training loops, model architecture, metrics, logging, and random 
+    # seed handling remain COMPLETELY UNCHANGED.
+    # =================================================================
+    if config.data_profile == "non_iid_hard":
+        from src.data.non_iid_generator import generate_non_iid_hard_centralized
+        
+        print("Using NON-IID HARD data profile (centralized)")
+        print("  - Merging heterogeneous client data for centralized training")
+        
+        X, y = generate_non_iid_hard_centralized(
+            num_clients=5,  # Default number of clients
+            seq_length=100,
+            num_channels=14,
+            task=config.task,
+            num_classes=config.num_classes,
+            seed=config.seed,
+        )
+        num_channels = X.shape[2]
+        print(f"Data shape: X={X.shape}, y={y.shape}")
+        print(f"Number of channels: {num_channels}")
+    # =================================================================
+    # END NON-IID HARD MODE DATA DISPATCH
+    # =================================================================
+    # =================================================================
+    # CLEAN MODE (DEFAULT) - EXISTING BEHAVIOR UNCHANGED
+    # =================================================================
+    elif args.synthetic:
         print("Using synthetic data for testing...")
         X, y = create_synthetic_data(
             num_samples=args.synthetic_samples,

@@ -67,6 +67,12 @@ logger = logging.getLogger(__name__)
 class LocalOnlyConfig:
     """Configuration for local-only training baseline."""
 
+    # Data profile: "clean" for existing behavior, "non_iid_hard" for stress testing
+    # NOTE: Changing data_profile ONLY affects data generation.
+    # It does NOT alter: training loops, model architecture, aggregation,
+    # metrics, logging, or random seed handling.
+    data_profile: str = "clean"
+
     # Data settings
     data_dir: str = "data/raw"
     data_files: List[str] = field(default_factory=list)
@@ -658,66 +664,136 @@ class LocalOnlyBaseline:
         logger.info("=" * 60)
         logger.info(f"Configuration: {asdict(self.config)}")
 
-        # Load or generate data
-        if X is None or y is None:
-            X, y = self._load_data()
-
-        # Ensure data is 3D (N, W, C)
-        if X.ndim == 2:
-            X = segment_windows(
-                X,
-                W=self.config.window_size,
-                H=self.config.hop_size,
-                normalize=self.config.normalize_windows,
+        # =================================================================
+        # NON-IID HARD MODE DATA DISPATCH
+        # NOTE: This ONLY affects data generation/partitioning.
+        # Training loops, model architecture, metrics, logging, and random 
+        # seed handling remain COMPLETELY UNCHANGED.
+        # =================================================================
+        if self.config.data_profile == "non_iid_hard":
+            from src.data.non_iid_generator import generate_non_iid_hard_data
+            
+            logger.info("Using NON-IID HARD data profile")
+            logger.info("  - Label skew: client-specific RUL distributions")
+            logger.info("  - Feature skew: client-specific noise/bias")
+            logger.info("  - Quantity skew: imbalanced sample counts")
+            
+            # Generate pre-partitioned heterogeneous data
+            client_partitions = generate_non_iid_hard_data(
+                num_clients=self.config.num_clients,
+                seq_length=100,
+                num_channels=14,
+                task=self.config.task,
+                num_classes=self.config.num_classes,
+                seed=self.config.seed,
+                round_id=0,
             )
-            # Adjust y to match windows
-            num_windows = X.shape[0]
-            if len(y) > num_windows:
-                indices = list(range(
-                    self.config.window_size - 1,
-                    len(y),
-                    self.config.hop_size
-                ))[:num_windows]
-                y = y[indices]
+            
+            # Create merged dataset for global test set
+            all_X = np.concatenate([X_c for X_c, y_c in client_partitions], axis=0)
+            all_y = np.concatenate([y_c for X_c, y_c in client_partitions], axis=0)
+            
+            logger.info(f"Total data shape: {all_X.shape}")
+            
+            # Hold out global test set
+            X_train_full, y_train_full, X_test_global, y_test_global = self._split_global_test(all_X, all_y)
+            
+            # Convert global test to tensors
+            self.global_test_data = (
+                torch.tensor(X_test_global, dtype=torch.float32),
+                torch.tensor(
+                    y_test_global,
+                    dtype=torch.float32 if self.config.task == "rul" else torch.long
+                ),
+            )
+            
+            logger.info(f"Training data: {len(X_train_full)} samples")
+            logger.info(f"Global test data: {len(X_test_global)} samples")
+            
+            # Re-use pre-partitioned data (proportionally reduce for test split)
+            test_fraction = self.config.global_test_split
+            train_partitions = []
+            for client_id, (X_c, y_c) in enumerate(client_partitions):
+                n_train = int(len(X_c) * (1 - test_fraction))
+                train_partitions.append((X_c[:n_train], y_c[:n_train]))
+            
+            client_partitions = train_partitions
+            num_channels = client_partitions[0][0].shape[2]
+            
+            logger.info(f"\nClient data distribution (non_iid_hard):")
+            for i, (X_c, y_c) in enumerate(client_partitions):
+                if self.config.task == "classification":
+                    pos_frac = np.mean(y_c == 1) if len(y_c) > 0 else 0
+                    logger.info(f"  Client {i}: {len(X_c)} samples, {pos_frac:.1%} positive")
+                else:
+                    logger.info(f"  Client {i}: {len(X_c)} samples, RUL range: [{y_c.min():.1f}, {y_c.max():.1f}]")
+        # =================================================================
+        # END NON-IID HARD MODE DATA DISPATCH
+        # =================================================================
+        else:
+            # =================================================================
+            # CLEAN MODE (DEFAULT) - EXISTING BEHAVIOR UNCHANGED
+            # =================================================================
+            # Load or generate data
+            if X is None or y is None:
+                X, y = self._load_data()
 
-        logger.info(f"Data shape: {X.shape}, Labels shape: {y.shape}")
+            # Ensure data is 3D (N, W, C)
+            if X.ndim == 2:
+                X = segment_windows(
+                    X,
+                    W=self.config.window_size,
+                    H=self.config.hop_size,
+                    normalize=self.config.normalize_windows,
+                )
+                # Adjust y to match windows
+                num_windows = X.shape[0]
+                if len(y) > num_windows:
+                    indices = list(range(
+                        self.config.window_size - 1,
+                        len(y),
+                        self.config.hop_size
+                    ))[:num_windows]
+                    y = y[indices]
 
-        # Hold out global test set
-        X_train_full, y_train_full, X_test_global, y_test_global = self._split_global_test(X, y)
-        
-        # Convert global test to tensors
-        self.global_test_data = (
-            torch.tensor(X_test_global, dtype=torch.float32),
-            torch.tensor(
-                y_test_global,
-                dtype=torch.float32 if self.config.task == "rul" else torch.long
-            ),
-        )
-        
-        logger.info(f"Training data: {len(X_train_full)} samples")
-        logger.info(f"Global test data: {len(X_test_global)} samples")
+            logger.info(f"Data shape: {X.shape}, Labels shape: {y.shape}")
 
-        # Partition data across clients
-        client_partitions = partition_data_for_clients(
-            X_train_full,
-            y_train_full,
-            num_clients=self.config.num_clients,
-            heterogeneity_mode=self.config.heterogeneity_mode,
-            dirichlet_alpha=self.config.dirichlet_alpha,
-            extreme_imbalance=self.config.extreme_imbalance,
-            seed=self.config.seed,
-        )
+            # Hold out global test set
+            X_train_full, y_train_full, X_test_global, y_test_global = self._split_global_test(X, y)
+            
+            # Convert global test to tensors
+            self.global_test_data = (
+                torch.tensor(X_test_global, dtype=torch.float32),
+                torch.tensor(
+                    y_test_global,
+                    dtype=torch.float32 if self.config.task == "rul" else torch.long
+                ),
+            )
+            
+            logger.info(f"Training data: {len(X_train_full)} samples")
+            logger.info(f"Global test data: {len(X_test_global)} samples")
 
-        logger.info(f"\nClient data distribution:")
-        for i, (X_c, y_c) in enumerate(client_partitions):
-            if self.config.task == "classification":
-                pos_frac = np.mean(y_c == 1) if len(y_c) > 0 else 0
-                logger.info(f"  Client {i}: {len(X_c)} samples, {pos_frac:.1%} positive")
-            else:
-                logger.info(f"  Client {i}: {len(X_c)} samples, RUL range: [{y_c.min():.1f}, {y_c.max():.1f}]")
+            # Partition data across clients
+            client_partitions = partition_data_for_clients(
+                X_train_full,
+                y_train_full,
+                num_clients=self.config.num_clients,
+                heterogeneity_mode=self.config.heterogeneity_mode,
+                dirichlet_alpha=self.config.dirichlet_alpha,
+                extreme_imbalance=self.config.extreme_imbalance,
+                seed=self.config.seed,
+            )
+            num_channels = X.shape[2]
+
+            logger.info(f"\nClient data distribution:")
+            for i, (X_c, y_c) in enumerate(client_partitions):
+                if self.config.task == "classification":
+                    pos_frac = np.mean(y_c == 1) if len(y_c) > 0 else 0
+                    logger.info(f"  Client {i}: {len(X_c)} samples, {pos_frac:.1%} positive")
+                else:
+                    logger.info(f"  Client {i}: {len(X_c)} samples, RUL range: [{y_c.min():.1f}, {y_c.max():.1f}]")
 
         # Train each client independently
-        num_channels = X.shape[2]
         total_train_time = 0.0
 
         for client_id, (X_client, y_client) in enumerate(client_partitions):

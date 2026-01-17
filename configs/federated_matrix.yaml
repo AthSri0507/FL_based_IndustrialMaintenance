@@ -35,6 +35,12 @@ base_config:
   # Experiment metadata
   experiment_name: "federated_rul_prediction"
   
+  # Data profile: "clean" for existing behavior, "non_iid_hard" for stress testing
+  # NOTE: Changing data_profile ONLY affects data generation.
+  # It does NOT alter: training loops, model architecture, aggregation,
+  # metrics, logging, or random seed handling.
+  data_profile: "clean"
+  
   # Data settings
   data_dir: "data/raw"
   window_size: 50

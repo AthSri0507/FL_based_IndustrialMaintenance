@@ -85,6 +85,12 @@ class FederatedExperimentConfig:
     experiment_id: str = ""
     experiment_name: str = "federated_experiment"
     
+    # Data profile: "clean" for existing behavior, "non_iid_hard" for stress testing
+    # NOTE: Changing data_profile ONLY affects data generation.
+    # It does NOT alter: training loops, model architecture, aggregation,
+    # metrics, logging, or random seed handling.
+    data_profile: str = "clean"
+    
     # Data settings
     data_dir: str = "data/raw"
     data_files: List[str] = field(default_factory=list)
@@ -548,6 +554,98 @@ class FederatedExperiment:
         """
         self._setup()
         
+        # =================================================================
+        # NON-IID HARD MODE DATA DISPATCH
+        # NOTE: This ONLY affects data generation/partitioning.
+        # Training loops, model architecture, aggregation, metrics,
+        # logging, and random seed handling remain COMPLETELY UNCHANGED.
+        # =================================================================
+        if self.config.data_profile == "non_iid_hard":
+            from src.data.non_iid_generator import generate_non_iid_hard_data
+            
+            logger.info("Using NON-IID HARD data profile")
+            logger.info("  - Label skew: client-specific RUL distributions")
+            logger.info("  - Feature skew: client-specific noise/bias")
+            logger.info("  - Quantity skew: imbalanced sample counts")
+            
+            # Generate pre-partitioned heterogeneous data
+            client_partitions = generate_non_iid_hard_data(
+                num_clients=self.config.num_clients,
+                seq_length=100,  # Fixed for synthetic data
+                num_channels=14,  # Fixed for synthetic data
+                task=self.config.task,
+                num_classes=self.config.num_classes,
+                seed=self.config.seed,
+                round_id=0,  # No concept drift during initial data generation
+            )
+            
+            # Create merged dataset for global operations (test split, normalization)
+            all_X = np.concatenate([X_c for X_c, y_c in client_partitions], axis=0)
+            all_y = np.concatenate([y_c for X_c, y_c in client_partitions], axis=0)
+            
+            logger.info(f"Total data shape: {all_X.shape}")
+            
+            # Hold out global test set (from merged data)
+            X_train, y_train, X_test, y_test = self._split_test(all_X, all_y)
+            
+            # Auto-detect RUL scale for normalization
+            if self.config.task == "rul" and self.config.normalize_rul:
+                if self.config.rul_max is not None:
+                    self.rul_scale = float(self.config.rul_max)
+                else:
+                    self.rul_scale = float(y_train.max())
+            
+            # Normalize test targets for evaluation
+            if self.config.task == "rul" and self.config.normalize_rul:
+                y_test_normalized = y_test / self.rul_scale
+            else:
+                y_test_normalized = y_test
+            
+            self.global_test_data = (
+                torch.tensor(X_test, dtype=torch.float32),
+                torch.tensor(
+                    y_test_normalized,
+                    dtype=torch.float32 if self.config.task == "rul" else torch.long
+                ),
+            )
+            
+            # Re-generate client partitions excluding test indices
+            # (simplified: regenerate with same seed, proportionally reduce samples)
+            test_fraction = self.config.global_test_split
+            train_partitions = []
+            for client_id, (X_c, y_c) in enumerate(client_partitions):
+                n_train = int(len(X_c) * (1 - test_fraction))
+                train_partitions.append((X_c[:n_train], y_c[:n_train]))
+            
+            client_partitions = train_partitions
+            
+            # Log data distribution
+            logger.info(f"Partitioned data across {len(client_partitions)} clients (non_iid_hard)")
+            for i, (X_c, y_c) in enumerate(client_partitions):
+                if self.config.task == "rul":
+                    logger.info(f"  Client {i}: {len(X_c)} samples, RUL: [{y_c.min():.1f}, {y_c.max():.1f}]")
+                else:
+                    logger.info(f"  Client {i}: {len(X_c)} samples")
+            
+            # Initialize client trainers
+            self._init_clients(client_partitions)
+            
+            # Initialize global model
+            num_channels = client_partitions[0][0].shape[2]
+            self.global_model = create_model(self.config.task, num_channels, self.config)
+            self.global_model.to(self.config.device)
+            
+            # Run federated training (UNCHANGED)
+            results = self._run_federated_training()
+            
+            return results
+        # =================================================================
+        # END NON-IID HARD MODE DATA DISPATCH
+        # =================================================================
+        
+        # =================================================================
+        # CLEAN MODE (DEFAULT) - EXISTING BEHAVIOR UNCHANGED
+        # =================================================================
         # Load or generate data
         if X is None or y is None:
             X, y = self._load_data()
