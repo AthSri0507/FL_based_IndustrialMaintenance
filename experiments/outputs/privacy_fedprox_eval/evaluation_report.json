@@ -1,0 +1,211 @@
+{
+  "timestamp": "2026-01-17T16:09:31.761369",
+  "setup": {
+    "epsilon_grid": [
+      200,
+      150,
+      120,
+      100,
+      80
+    ],
+    "fedprox_mu": 0.1,
+    "num_clients": 5,
+    "local_epochs": 2,
+    "num_rounds": 12,
+    "data_profile": "non_iid_hard",
+    "heterogeneity_mode": "uniform",
+    "mae_threshold": 50.0,
+    "rmse_threshold": 80.0
+  },
+  "experiments": [
+    {
+      "name": "FedAvg_200",
+      "algorithm": "FEDAVG",
+      "epsilon": 200.0,
+      "mu": 0.0,
+      "final_mae": 29.101835250854492,
+      "final_rmse": 42.32208855535724,
+      "best_loss": 0.08267392252882322,
+      "best_round": 4,
+      "stable": true,
+      "status": "STABLE"
+    },
+    {
+      "name": "FedAvg_150",
+      "algorithm": "FEDAVG",
+      "epsilon": 150.0,
+      "mu": 0.0,
+      "final_mae": 39.825103759765625,
+      "final_rmse": 65.66042570609979,
+      "best_loss": 0.06746305261221197,
+      "best_round": 4,
+      "stable": true,
+      "status": "STABLE"
+    },
+    {
+      "name": "FedAvg_120",
+      "algorithm": "FEDAVG",
+      "epsilon": 120.0,
+      "mu": 0.0,
+      "final_mae": 65.57559204101562,
+      "final_rmse": 98.45718553164365,
+      "best_loss": 0.07678799636662006,
+      "best_round": 4,
+      "stable": false,
+      "status": "MAE=65.6 exceeds threshold 50.0"
+    },
+    {
+      "name": "FedAvg_100",
+      "algorithm": "FEDAVG",
+      "epsilon": 100.0,
+      "mu": 0.0,
+      "final_mae": 82.7552719116211,
+      "final_rmse": 140.45315889559052,
+      "best_loss": 0.0875470703177982,
+      "best_round": 2,
+      "stable": false,
+      "status": "MAE=82.8 exceeds threshold 50.0"
+    },
+    {
+      "name": "FedAvg_80",
+      "algorithm": "FEDAVG",
+      "epsilon": 80.0,
+      "mu": 0.0,
+      "final_mae": 142.4390411376953,
+      "final_rmse": 226.8836344775665,
+      "best_loss": 0.08883999370866352,
+      "best_round": 2,
+      "stable": false,
+      "status": "MAE=142.4 exceeds threshold 50.0"
+    },
+    {
+      "name": "FedProx_200",
+      "algorithm": "FEDPROX",
+      "epsilon": 200.0,
+      "mu": 0.1,
+      "final_mae": 32.58537292480469,
+      "final_rmse": 49.19237388495802,
+      "best_loss": 0.07062277044687006,
+      "best_round": 4,
+      "stable": true,
+      "status": "STABLE"
+    },
+    {
+      "name": "FedProx_150",
+      "algorithm": "FEDPROX",
+      "epsilon": 150.0,
+      "mu": 0.1,
+      "final_mae": 53.12257385253906,
+      "final_rmse": 77.18468175523074,
+      "best_loss": 0.07244394575556119,
+      "best_round": 4,
+      "stable": false,
+      "status": "MAE=53.1 exceeds threshold 50.0"
+    },
+    {
+      "name": "FedProx_120",
+      "algorithm": "FEDPROX",
+      "epsilon": 120.0,
+      "mu": 0.1,
+      "final_mae": 75.59883880615234,
+      "final_rmse": 109.41279257786769,
+      "best_loss": 0.08946814995672968,
+      "best_round": 4,
+      "stable": false,
+      "status": "MAE=75.6 exceeds threshold 50.0"
+    },
+    {
+      "name": "FedProx_100",
+      "algorithm": "FEDPROX",
+      "epsilon": 100.0,
+      "mu": 0.1,
+      "final_mae": 113.75272369384766,
+      "final_rmse": 174.8984024280239,
+      "best_loss": 0.16903911312421163,
+      "best_round": 2,
+      "stable": false,
+      "status": "MAE=113.8 exceeds threshold 50.0"
+    },
+    {
+      "name": "FedProx_80",
+      "algorithm": "FEDPROX",
+      "epsilon": 80.0,
+      "mu": 0.1,
+      "final_mae": 142.24844360351562,
+      "final_rmse": 256.68154211493277,
+      "best_loss": 0.18424754169252183,
+      "best_round": 2,
+      "stable": false,
+      "status": "MAE=142.2 exceeds threshold 50.0"
+    }
+  ],
+  "improvements": [
+    {
+      "epsilon": 200,
+      "fedavg_mae": 29.101835250854492,
+      "fedavg_rmse": 42.32208855535724,
+      "fedavg_stable": true,
+      "fedprox_mae": 32.58537292480469,
+      "fedprox_rmse": 49.19237388495802,
+      "fedprox_stable": true,
+      "mae_improvement_pct": -11.970164918887413,
+      "rmse_improvement_pct": -16.233332437302707,
+      "fedprox_better": false
+    },
+    {
+      "epsilon": 150,
+      "fedavg_mae": 39.825103759765625,
+      "fedavg_rmse": 65.66042570609979,
+      "fedavg_stable": true,
+      "fedprox_mae": 53.12257385253906,
+      "fedprox_rmse": 77.18468175523074,
+      "fedprox_stable": false,
+      "mae_improvement_pct": -33.389668418661,
+      "rmse_improvement_pct": -17.551296576592808,
+      "fedprox_better": false
+    },
+    {
+      "epsilon": 120,
+      "fedavg_mae": 65.57559204101562,
+      "fedavg_rmse": 98.45718553164365,
+      "fedavg_stable": false,
+      "fedprox_mae": 75.59883880615234,
+      "fedprox_rmse": 109.41279257786769,
+      "fedprox_stable": false,
+      "mae_improvement_pct": -15.285026719800667,
+      "rmse_improvement_pct": -11.127280337200954,
+      "fedprox_better": false
+    },
+    {
+      "epsilon": 100,
+      "fedavg_mae": 82.7552719116211,
+      "fedavg_rmse": 140.45315889559052,
+      "fedavg_stable": false,
+      "fedprox_mae": 113.75272369384766,
+      "fedprox_rmse": 174.8984024280239,
+      "fedprox_stable": false,
+      "mae_improvement_pct": -37.45676990262378,
+      "rmse_improvement_pct": -24.52436371191846,
+      "fedprox_better": false
+    },
+    {
+      "epsilon": 80,
+      "fedavg_mae": 142.4390411376953,
+      "fedavg_rmse": 226.8836344775665,
+      "fedavg_stable": false,
+      "fedprox_mae": 142.24844360351562,
+      "fedprox_rmse": 256.68154211493277,
+      "fedprox_stable": false,
+      "mae_improvement_pct": 0.13380989696177298,
+      "rmse_improvement_pct": -13.133564131225429,
+      "fedprox_better": true
+    }
+  ],
+  "collapse_thresholds": {
+    "fedavg_min_stable_eps": 150,
+    "fedprox_min_stable_eps": 200,
+    "threshold_shift": -50
+  },
+  "fedprox_wins": 1,
+  "total_comparisons": 5
+}

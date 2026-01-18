@@ -1,0 +1,31 @@
+{
+  "algorithm": "fedprox",
+  "fedprox_mu": 0.1,
+  "loss": {
+    "initial": 0.09712382186204195,
+    "final": 0.07600041463971138,
+    "best": 0.07205877146787114,
+    "best_round": "8",
+    "improvement_pct": 21.74894564212577,
+    "avg_round_improvement": 0.0015088148015950406,
+    "is_converging": "True"
+  },
+  "mae": {
+    "initial": 20.41315460205078,
+    "final": 21.906166076660156,
+    "best": 19.27823829650879,
+    "best_round": "2",
+    "improvement_pct": -7.313967408346486,
+    "avg_round_improvement": -0.1066436767578125,
+    "is_converging": "False"
+  },
+  "rmse": {
+    "initial": 31.159676106132146,
+    "final": 27.56373340848555,
+    "best": 26.839439818765896,
+    "best_round": "8",
+    "improvement_pct": 11.540372516705727,
+    "avg_round_improvement": 0.25685304983189966,
+    "is_converging": "True"
+  }
+}

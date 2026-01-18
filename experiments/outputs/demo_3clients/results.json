@@ -1,0 +1,230 @@
+{
+  "experiment_id": "uniform_pf1.0_le2",
+  "config": {
+    "experiment_id": "uniform_pf1.0_le2",
+    "experiment_name": "demo_3clients",
+    "data_dir": "data/raw",
+    "data_files": [],
+    "window_size": 50,
+    "hop_size": 10,
+    "normalize_windows": true,
+    "global_test_split": 0.15,
+    "num_clients": 3,
+    "heterogeneity_mode": "uniform",
+    "dirichlet_alpha": 0.5,
+    "extreme_imbalance": [],
+    "task": "rul",
+    "num_classes": 2,
+    "num_layers": 4,
+    "hidden_dim": 64,
+    "kernel_size": 3,
+    "dropout": 0.2,
+    "fc_hidden": 32,
+    "num_rounds": 10,
+    "participation_fraction": 1.0,
+    "local_epochs": 2,
+    "batch_size": 16,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "optimizer": "adam",
+    "early_stopping_enabled": true,
+    "early_stopping_patience": 3,
+    "normalize_rul": true,
+    "rul_max": null,
+    "enable_dp": false,
+    "dp_epsilon": 1.0,
+    "dp_delta": 1e-05,
+    "dp_max_grad_norm": 1.0,
+    "enable_compression": false,
+    "compression_ratio": 0.1,
+    "eval_every": 2,
+    "checkpoint_every": 10,
+    "seed": 42,
+    "deterministic": true,
+    "output_dir": "experiments/outputs/demo_3clients",
+    "save_checkpoints": false,
+    "device": "cpu"
+  },
+  "final_metrics": {
+    "mse": 52.28260803222656,
+    "mae": 6.086019515991211,
+    "rmse": 7.230671340354681,
+    "score": 43.8388557434082,
+    "loss": 0.005840284511860874
+  },
+  "best_loss": 0.0032123260355244082,
+  "best_round": 6,
+  "total_time": 13.669423818588257,
+  "round_history": [
+    {
+      "round_id": 1,
+      "num_participants": 3,
+      "total_samples": 204,
+      "avg_client_metrics": {
+        "score": 49.66306813557943,
+        "mse": 176.65023549397787,
+        "mae": 11.085136731465658,
+        "loss": 0.019732904643295152,
+        "rmse": 13.206527973880702
+      },
+      "global_metrics": null,
+      "round_time": 2.625173568725586
+    },
+    {
+      "round_id": 2,
+      "num_participants": 3,
+      "total_samples": 204,
+      "avg_client_metrics": {
+        "score": 24.67616907755534,
+        "mse": 143.01847076416016,
+        "mae": 9.52819045384725,
+        "loss": 0.0159760283707988,
+        "rmse": 11.694381742812089
+      },
+      "global_metrics": {
+        "mse": 153.10105895996094,
+        "mae": 11.430458068847656,
+        "rmse": 12.373401268849278,
+        "score": 70.61618041992188,
+        "loss": 0.017102317263682682
+      },
+      "round_time": 0.8087821006774902
+    },
+    {
+      "round_id": 3,
+      "num_participants": 3,
+      "total_samples": 204,
+      "avg_client_metrics": {
+        "score": 36.73112932840983,
+        "mse": 132.1257298787435,
+        "mae": 9.434898853302002,
+        "loss": 0.014759247223207471,
+        "rmse": 11.430596588572124
+      },
+      "global_metrics": null,
+      "round_time": 0.8180811405181885
+    },
+    {
+      "round_id": 4,
+      "num_participants": 3,
+      "total_samples": 204,
+      "avg_client_metrics": {
+        "score": 20.748780568440754,
+        "mse": 76.14050547281902,
+        "mae": 7.353460947672526,
+        "loss": 0.008505357705586242,
+        "rmse": 8.470188659116776
+      },
+      "global_metrics": {
+        "mse": 32.234134674072266,
+        "mae": 4.813339710235596,
+        "rmse": 5.677511309902629,
+        "score": 23.76481819152832,
+        "loss": 0.0036007491406053306
+      },
+      "round_time": 0.8878400325775146
+    },
+    {
+      "round_id": 5,
+      "num_participants": 3,
+      "total_samples": 204,
+      "avg_client_metrics": {
+        "score": 49.83594830830892,
+        "mse": 177.68580881754556,
+        "mae": 11.334635575612387,
+        "loss": 0.0198485837181044,
+        "rmse": 13.091781343440744
+      },
+      "global_metrics": null,
+      "round_time": 0.8610734939575195
+    },
+    {
+      "round_id": 6,
+      "num_participants": 3,
+      "total_samples": 204,
+      "avg_client_metrics": {
+        "score": 27.376150767008465,
+        "mse": 95.46724955240886,
+        "mae": 7.811065038045247,
+        "loss": 0.010664270955649223,
+        "rmse": 9.24390267844749
+      },
+      "global_metrics": {
+        "mse": 28.756946563720703,
+        "mae": 4.4430623054504395,
+        "rmse": 5.362550378665053,
+        "score": 23.268421173095703,
+        "loss": 0.0032123260355244082
+      },
+      "round_time": 0.919940710067749
+    },
+    {
+      "round_id": 7,
+      "num_participants": 3,
+      "total_samples": 204,
+      "avg_client_metrics": {
+        "score": 26.44068145751953,
+        "mse": 93.0943120320638,
+        "mae": 8.148266315460205,
+        "loss": 0.010399199063613196,
+        "rmse": 9.44208759190376
+      },
+      "global_metrics": null,
+      "round_time": 0.9863708019256592
+    },
+    {
+      "round_id": 8,
+      "num_participants": 3,
+      "total_samples": 204,
+      "avg_client_metrics": {
+        "score": 10.037305037180582,
+        "mse": 34.4408327738444,
+        "mae": 4.917283455530803,
+        "loss": 0.003847250901505022,
+        "rmse": 5.778109580600156
+      },
+      "global_metrics": {
+        "mse": 72.57930755615234,
+        "mae": 6.983335494995117,
+        "rmse": 8.519349010115288,
+        "score": 38.33129119873047,
+        "loss": 0.008107550276650322
+      },
+      "round_time": 1.5290918350219727
+    },
+    {
+      "round_id": 9,
+      "num_participants": 3,
+      "total_samples": 204,
+      "avg_client_metrics": {
+        "score": 24.407546679178875,
+        "mse": 91.69044240315755,
+        "mae": 8.12710158030192,
+        "loss": 0.01024237797052289,
+        "rmse": 9.385502677022666
+      },
+      "global_metrics": null,
+      "round_time": 2.038665771484375
+    },
+    {
+      "round_id": 10,
+      "num_participants": 3,
+      "total_samples": 204,
+      "avg_client_metrics": {
+        "score": 33.787299474080406,
+        "mse": 119.80658721923828,
+        "mae": 9.423455238342285,
+        "loss": 0.013383123516926871,
+        "rmse": 10.657891038809998
+      },
+      "global_metrics": {
+        "mse": 52.28260803222656,
+        "mae": 6.086019515991211,
+        "rmse": 7.230671340354681,
+        "score": 43.8388557434082,
+        "loss": 0.005840284511860874
+      },
+      "round_time": 1.9825489521026611
+    }
+  ]
+}

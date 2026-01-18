@@ -13,7 +13,7 @@ data/**
 
 logs/
 runs/
-experiments/outputs/
+experiments/__pycache__
 # Model checkpoints
 *.pt
 *.pth

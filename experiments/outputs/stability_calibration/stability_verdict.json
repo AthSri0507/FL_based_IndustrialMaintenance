@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-01-17T15:41:53.644120",
+  "min_stable_epsilon": 100.0,
+  "all_stable": false,
+  "experiments": [
+    {
+      "name": "baseline",
+      "dp_enabled": false,
+      "epsilon": Infinity,
+      "final_mae": 20.92970085144043,
+      "final_rmse": 29.597776628450596,
+      "stable": true
+    },
+    {
+      "name": "eps_300",
+      "dp_enabled": true,
+      "epsilon": 300.0,
+      "final_mae": 21.467506408691406,
+      "final_rmse": 28.57230561136463,
+      "stable": true
+    },
+    {
+      "name": "eps_200",
+      "dp_enabled": true,
+      "epsilon": 200.0,
+      "final_mae": 19.661911010742188,
+      "final_rmse": 25.349542485007866,
+      "stable": true
+    },
+    {
+      "name": "eps_100",
+      "dp_enabled": true,
+      "epsilon": 100.0,
+      "final_mae": 30.009483337402344,
+      "final_rmse": 40.795727494873006,
+      "stable": true
+    },
+    {
+      "name": "eps_60",
+      "dp_enabled": true,
+      "epsilon": 60.0,
+      "final_mae": 93.70869445800781,
+      "final_rmse": 124.9236485568285,
+      "stable": false
+    }
+  ]
+}

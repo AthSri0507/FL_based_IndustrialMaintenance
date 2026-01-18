@@ -1,0 +1,182 @@
+{
+  "timestamp": "2026-01-17T22:19:45.989858",
+  "data_profile": "non_iid_mild",
+  "algorithms": [
+    "fedavg",
+    "fedprox"
+  ],
+  "rounds_tested": [
+    5,
+    10,
+    15
+  ],
+  "epsilon_values": [
+    "inf",
+    200,
+    80
+  ],
+  "summary": [
+    {
+      "Experiment": "FedAvg-5r-\u03b580",
+      "Algorithm": "FEDAVG",
+      "Rounds": 5,
+      "DP Enabled": true,
+      "Epsilon": 80.0,
+      "Final MAE": 28.507722854614258,
+      "Final RMSE": 34.134204559333696
+    },
+    {
+      "Experiment": "FedAvg-10r-\u03b580",
+      "Algorithm": "FEDAVG",
+      "Rounds": 10,
+      "DP Enabled": true,
+      "Epsilon": 80.0,
+      "Final MAE": 51.77790832519531,
+      "Final RMSE": 79.45620845786691
+    },
+    {
+      "Experiment": "Fedavg-15r-\u03b580",
+      "Algorithm": "FEDAVG",
+      "Rounds": 15,
+      "DP Enabled": true,
+      "Epsilon": 80.0,
+      "Final MAE": 143.65696716308594,
+      "Final RMSE": 222.2848854791976
+    },
+    {
+      "Experiment": "FedAvg-5r-\u03b5200",
+      "Algorithm": "FEDAVG",
+      "Rounds": 5,
+      "DP Enabled": true,
+      "Epsilon": 200.0,
+      "Final MAE": 19.12335777282715,
+      "Final RMSE": 23.01828072551453
+    },
+    {
+      "Experiment": "FedAvg-10r-\u03b5200",
+      "Algorithm": "FEDAVG",
+      "Rounds": 10,
+      "DP Enabled": true,
+      "Epsilon": 200.0,
+      "Final MAE": 19.949392318725586,
+      "Final RMSE": 23.94788806499307
+    },
+    {
+      "Experiment": "Fedavg-15r-\u03b5200",
+      "Algorithm": "FEDAVG",
+      "Rounds": 15,
+      "DP Enabled": true,
+      "Epsilon": 200.0,
+      "Final MAE": 21.913692474365234,
+      "Final RMSE": 27.828313622325375
+    },
+    {
+      "Experiment": "FedAvg-5r-noDP",
+      "Algorithm": "FEDAVG",
+      "Rounds": 5,
+      "DP Enabled": false,
+      "Epsilon": Infinity,
+      "Final MAE": 19.037723541259766,
+      "Final RMSE": 23.321721848116994
+    },
+    {
+      "Experiment": "FedAvg-10r-noDP",
+      "Algorithm": "FEDAVG",
+      "Rounds": 10,
+      "DP Enabled": false,
+      "Epsilon": Infinity,
+      "Final MAE": 19.06595802307129,
+      "Final RMSE": 23.332061006280206
+    },
+    {
+      "Experiment": "Fedavg-15r-noDP",
+      "Algorithm": "FEDAVG",
+      "Rounds": 15,
+      "DP Enabled": false,
+      "Epsilon": Infinity,
+      "Final MAE": 19.206926345825195,
+      "Final RMSE": 23.527980298648536
+    },
+    {
+      "Experiment": "FedProx-5r-\u03b580",
+      "Algorithm": "FEDPROX",
+      "Rounds": 5,
+      "DP Enabled": true,
+      "Epsilon": 80.0,
+      "Final MAE": 24.452917098999023,
+      "Final RMSE": 29.13434604773044
+    },
+    {
+      "Experiment": "FedProx-10r-\u03b580",
+      "Algorithm": "FEDPROX",
+      "Rounds": 10,
+      "DP Enabled": true,
+      "Epsilon": 80.0,
+      "Final MAE": 46.825435638427734,
+      "Final RMSE": 65.84249301719028
+    },
+    {
+      "Experiment": "Fedprox-15r-\u03b580",
+      "Algorithm": "FEDPROX",
+      "Rounds": 15,
+      "DP Enabled": true,
+      "Epsilon": 80.0,
+      "Final MAE": 130.2846221923828,
+      "Final RMSE": 213.14502288641413
+    },
+    {
+      "Experiment": "FedProx-5r-\u03b5200",
+      "Algorithm": "FEDPROX",
+      "Rounds": 5,
+      "DP Enabled": true,
+      "Epsilon": 200.0,
+      "Final MAE": 20.264507293701172,
+      "Final RMSE": 23.87773651897372
+    },
+    {
+      "Experiment": "FedProx-10r-\u03b5200",
+      "Algorithm": "FEDPROX",
+      "Rounds": 10,
+      "DP Enabled": true,
+      "Epsilon": 200.0,
+      "Final MAE": 20.054065704345703,
+      "Final RMSE": 25.050849166152283
+    },
+    {
+      "Experiment": "Fedprox-15r-\u03b5200",
+      "Algorithm": "FEDPROX",
+      "Rounds": 15,
+      "DP Enabled": true,
+      "Epsilon": 200.0,
+      "Final MAE": 21.369455337524414,
+      "Final RMSE": 26.356957506214084
+    },
+    {
+      "Experiment": "FedProx-5r-noDP",
+      "Algorithm": "FEDPROX",
+      "Rounds": 5,
+      "DP Enabled": false,
+      "Epsilon": Infinity,
+      "Final MAE": 18.686216354370117,
+      "Final RMSE": 22.742427697546386
+    },
+    {
+      "Experiment": "FedProx-10r-noDP",
+      "Algorithm": "FEDPROX",
+      "Rounds": 10,
+      "DP Enabled": false,
+      "Epsilon": Infinity,
+      "Final MAE": 19.200597763061523,
+      "Final RMSE": 22.957101372298045
+    },
+    {
+      "Experiment": "Fedprox-15r-noDP",
+      "Algorithm": "FEDPROX",
+      "Rounds": 15,
+      "DP Enabled": false,
+      "Epsilon": Infinity,
+      "Final MAE": 19.259511947631836,
+      "Final RMSE": 23.02384840149109
+    }
+  ]
+}

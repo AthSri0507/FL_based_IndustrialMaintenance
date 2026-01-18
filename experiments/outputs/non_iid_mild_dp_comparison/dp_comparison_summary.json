@@ -1,0 +1,78 @@
+{
+  "timestamp": "2026-01-17T21:19:50.525822",
+  "data_profile": "non_iid_mild",
+  "experiments": [
+    {
+      "name": "Baseline-noDP",
+      "enable_dp": false,
+      "dp_epsilon": Infinity
+    },
+    {
+      "name": "DP-\u03b5200",
+      "enable_dp": true,
+      "dp_epsilon": 200.0
+    },
+    {
+      "name": "DP-\u03b5120",
+      "enable_dp": true,
+      "dp_epsilon": 120.0
+    },
+    {
+      "name": "DP-\u03b580",
+      "enable_dp": true,
+      "dp_epsilon": 80.0
+    },
+    {
+      "name": "DP-\u03b560",
+      "enable_dp": true,
+      "dp_epsilon": 60.0
+    }
+  ],
+  "summary": [
+    {
+      "Experiment": "Baseline-noDP",
+      "DP Enabled": false,
+      "Epsilon": Infinity,
+      "Initial MAE": 18.632055282592773,
+      "Final MAE": 19.206926345825195,
+      "Final RMSE": 23.527980298648536,
+      "Improvement %": -3.085387277535089
+    },
+    {
+      "Experiment": "DP-\u03b5200",
+      "DP Enabled": true,
+      "Epsilon": 200.0,
+      "Initial MAE": 18.974990844726562,
+      "Final MAE": 21.913692474365234,
+      "Final RMSE": 27.828313622325375,
+      "Improvement %": -15.487236087154063
+    },
+    {
+      "Experiment": "DP-\u03b5120",
+      "DP Enabled": true,
+      "Epsilon": 120.0,
+      "Initial MAE": 18.981340408325195,
+      "Final MAE": 47.36955261230469,
+      "Final RMSE": 71.31588921613121,
+      "Improvement %": -149.55852217648683
+    },
+    {
+      "Experiment": "DP-\u03b580",
+      "DP Enabled": true,
+      "Epsilon": 80.0,
+      "Initial MAE": 19.63077163696289,
+      "Final MAE": 143.65696716308594,
+      "Final RMSE": 222.2848854791976,
+      "Improvement %": -631.79480572528
+    },
+    {
+      "Experiment": "DP-\u03b560",
+      "DP Enabled": true,
+      "Epsilon": 60.0,
+      "Initial MAE": 21.627056121826172,
+      "Final MAE": 409.8975830078125,
+      "Final RMSE": 606.263169960043,
+      "Improvement %": -1795.2999460437018
+    }
+  ]
+}

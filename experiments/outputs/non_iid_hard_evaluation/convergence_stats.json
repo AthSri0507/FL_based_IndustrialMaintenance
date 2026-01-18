@@ -1,0 +1,29 @@
+{
+  "loss": {
+    "initial": 0.11392457704822946,
+    "final": 0.08921438389354282,
+    "best": 0.07970343494580852,
+    "best_round": "6",
+    "improvement_pct": 21.689958211761184,
+    "avg_round_improvement": 0.0017650137967633317,
+    "is_converging": "False"
+  },
+  "mae": {
+    "initial": 23.592836380004883,
+    "final": 20.921199798583984,
+    "best": 20.661640167236328,
+    "best_round": "4",
+    "improvement_pct": 11.323931291640422,
+    "avg_round_improvement": 0.19083118438720703,
+    "is_converging": "False"
+  },
+  "rmse": {
+    "initial": 33.74727817439041,
+    "final": 29.86396668809514,
+    "best": 28.227250112715218,
+    "best_round": "6",
+    "improvement_pct": 11.507036111855014,
+    "avg_round_improvement": 0.27737939187823357,
+    "is_converging": "False"
+  }
+}

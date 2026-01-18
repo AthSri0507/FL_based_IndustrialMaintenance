@@ -1,0 +1,193 @@
+{
+  "timestamp": "2026-01-17T21:49:54.544390",
+  "data_profile": "non_iid_mild",
+  "algorithms": [
+    "fedavg",
+    "fedprox"
+  ],
+  "fedprox_mu": 0.01,
+  "experiments": [
+    {
+      "name": "FedAvg-Baseline",
+      "algorithm": "fedavg",
+      "enable_dp": false,
+      "dp_epsilon": Infinity,
+      "fedprox_mu": 0.0
+    },
+    {
+      "name": "FedAvg-\u03b5200",
+      "algorithm": "fedavg",
+      "enable_dp": true,
+      "dp_epsilon": 200.0,
+      "fedprox_mu": 0.0
+    },
+    {
+      "name": "FedAvg-\u03b5120",
+      "algorithm": "fedavg",
+      "enable_dp": true,
+      "dp_epsilon": 120.0,
+      "fedprox_mu": 0.0
+    },
+    {
+      "name": "FedAvg-\u03b580",
+      "algorithm": "fedavg",
+      "enable_dp": true,
+      "dp_epsilon": 80.0,
+      "fedprox_mu": 0.0
+    },
+    {
+      "name": "FedAvg-\u03b560",
+      "algorithm": "fedavg",
+      "enable_dp": true,
+      "dp_epsilon": 60.0,
+      "fedprox_mu": 0.0
+    },
+    {
+      "name": "FedProx-Baseline",
+      "algorithm": "fedprox",
+      "enable_dp": false,
+      "dp_epsilon": Infinity,
+      "fedprox_mu": 0.01
+    },
+    {
+      "name": "FedProx-\u03b5200",
+      "algorithm": "fedprox",
+      "enable_dp": true,
+      "dp_epsilon": 200.0,
+      "fedprox_mu": 0.01
+    },
+    {
+      "name": "FedProx-\u03b5120",
+      "algorithm": "fedprox",
+      "enable_dp": true,
+      "dp_epsilon": 120.0,
+      "fedprox_mu": 0.01
+    },
+    {
+      "name": "FedProx-\u03b580",
+      "algorithm": "fedprox",
+      "enable_dp": true,
+      "dp_epsilon": 80.0,
+      "fedprox_mu": 0.01
+    },
+    {
+      "name": "FedProx-\u03b560",
+      "algorithm": "fedprox",
+      "enable_dp": true,
+      "dp_epsilon": 60.0,
+      "fedprox_mu": 0.01
+    }
+  ],
+  "summary": [
+    {
+      "Experiment": "FedAvg-Baseline",
+      "Algorithm": "FEDAVG",
+      "DP Enabled": false,
+      "Epsilon": Infinity,
+      "FedProx \u03bc": 0.0,
+      "Initial MAE": 18.632055282592773,
+      "Final MAE": 19.206926345825195,
+      "Final RMSE": 23.527980298648536,
+      "Improvement %": -3.085387277535089
+    },
+    {
+      "Experiment": "FedAvg-\u03b5200",
+      "Algorithm": "FEDAVG",
+      "DP Enabled": true,
+      "Epsilon": 200.0,
+      "FedProx \u03bc": 0.0,
+      "Initial MAE": 18.974990844726562,
+      "Final MAE": 21.913692474365234,
+      "Final RMSE": 27.828313622325375,
+      "Improvement %": -15.487236087154063
+    },
+    {
+      "Experiment": "FedAvg-\u03b5120",
+      "Algorithm": "FEDAVG",
+      "DP Enabled": true,
+      "Epsilon": 120.0,
+      "FedProx \u03bc": 0.0,
+      "Initial MAE": 18.981340408325195,
+      "Final MAE": 47.36955261230469,
+      "Final RMSE": 71.31588921613121,
+      "Improvement %": -149.55852217648683
+    },
+    {
+      "Experiment": "FedAvg-\u03b580",
+      "Algorithm": "FEDAVG",
+      "DP Enabled": true,
+      "Epsilon": 80.0,
+      "FedProx \u03bc": 0.0,
+      "Initial MAE": 19.63077163696289,
+      "Final MAE": 143.65696716308594,
+      "Final RMSE": 222.2848854791976,
+      "Improvement %": -631.79480572528
+    },
+    {
+      "Experiment": "FedAvg-\u03b560",
+      "Algorithm": "FEDAVG",
+      "DP Enabled": true,
+      "Epsilon": 60.0,
+      "FedProx \u03bc": 0.0,
+      "Initial MAE": 21.627056121826172,
+      "Final MAE": 409.8975830078125,
+      "Final RMSE": 606.263169960043,
+      "Improvement %": -1795.2999460437018
+    },
+    {
+      "Experiment": "FedProx-Baseline",
+      "Algorithm": "FEDPROX",
+      "DP Enabled": false,
+      "Epsilon": Infinity,
+      "FedProx \u03bc": 0.01,
+      "Initial MAE": 18.63827896118164,
+      "Final MAE": 19.259511947631836,
+      "Final RMSE": 23.02384840149109,
+      "Improvement %": -3.333102738423709
+    },
+    {
+      "Experiment": "FedProx-\u03b5200",
+      "Algorithm": "FEDPROX",
+      "DP Enabled": true,
+      "Epsilon": 200.0,
+      "FedProx \u03bc": 0.01,
+      "Initial MAE": 18.642765045166016,
+      "Final MAE": 21.369455337524414,
+      "Final RMSE": 26.356957506214084,
+      "Improvement %": -14.62599719383052
+    },
+    {
+      "Experiment": "FedProx-\u03b5120",
+      "Algorithm": "FEDPROX",
+      "DP Enabled": true,
+      "Epsilon": 120.0,
+      "FedProx \u03bc": 0.01,
+      "Initial MAE": 18.56480598449707,
+      "Final MAE": 52.46349334716797,
+      "Final RMSE": 85.96029243202933,
+      "Improvement %": -182.5965075583268
+    },
+    {
+      "Experiment": "FedProx-\u03b580",
+      "Algorithm": "FEDPROX",
+      "DP Enabled": true,
+      "Epsilon": 80.0,
+      "FedProx \u03bc": 0.01,
+      "Initial MAE": 19.196779251098633,
+      "Final MAE": 130.2846221923828,
+      "Final RMSE": 213.14502288641413,
+      "Improvement %": -578.6795872798642
+    },
+    {
+      "Experiment": "FedProx-\u03b560",
+      "Algorithm": "FEDPROX",
+      "DP Enabled": true,
+      "Epsilon": 60.0,
+      "FedProx \u03bc": 0.01,
+      "Initial MAE": 21.02975845336914,
+      "Final MAE": 348.3005065917969,
+      "Final RMSE": 536.4374089770399,
+      "Improvement %": -1556.226852838608
+    }
+  ]
+}
