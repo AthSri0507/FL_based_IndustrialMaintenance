@@ -719,6 +719,9 @@ def train(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Create model, optimizer, scheduler
+    if device == "auto":
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
     model = create_model(num_channels, config).to(device)
     optimizer = create_optimizer(model, config)
     scheduler = create_scheduler(optimizer, config)

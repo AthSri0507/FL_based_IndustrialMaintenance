@@ -12,8 +12,9 @@ Design notes:
 - Checkpoints include model state, round info, and config
 
 Execution model:
-- **Rounds are synchronous**: The orchestrator calls `train_client_fn` for each selected
-  client sequentially and waits for completion. There is NO timeout enforcement at this
+Execution model:
+- **Rounds are synchronous**: Clients within a round are executed in parallel
+  using multiprocessing, but aggregation and round advancement remain synchronous. There is NO timeout enforcement at this
   layer. A hanging client will block the round indefinitely. For production use, implement
   timeouts in the transport layer (e.g., HTTP client timeout) or use async execution.
 - Client selection samples from `available_client_ids` (if provided) or falls back to
@@ -28,11 +29,22 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Callable
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import torch
 import torch.nn as nn
 
 from .aggregator import FedAvgAggregator, sample_clients, apply_delta
+
+def _train_client_worker(args):
+    """
+    Worker function for multiprocessing.
+    Must be top-level to be picklable.
+    """
+    client_id, global_state_snapshot, config, train_client_fn = args
+    result = train_client_fn(client_id, global_state_snapshot, config)
+    return client_id, result
+
 
 
 # ---------------------- Metrics ----------------------
@@ -352,19 +364,37 @@ class FLOrchestrator:
         client_losses = {}
         errors = []
 
-        for client_id in selected:
-            try:
-                result = train_client_fn(client_id, global_state_snapshot, self.config)
-                self.aggregator.add_update(
-                    client_id=client_id,
-                    delta=result["delta"],
-                    num_samples=result["num_samples"],
-                    round_id=round_id,
+        max_workers = min(
+            len(selected),
+            max(1, os.cpu_count() // 2)
+        )
+
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures = [
+                executor.submit(
+                    _train_client_worker,
+                    (client_id, global_state_snapshot, self.config, train_client_fn)
                 )
-                if "metrics" in result and "loss" in result["metrics"]:
-                    client_losses[client_id] = result["metrics"]["loss"]
-            except Exception as e:
-                errors.append(f"{client_id}: {str(e)}")
+                for client_id in selected
+            ]
+
+            for future in as_completed(futures):
+                try:
+                    client_id, result = future.result()
+
+                    self.aggregator.add_update(
+                        client_id=client_id,
+                        delta=result["delta"],
+                        num_samples=result["num_samples"],
+                        round_id=round_id,
+                    )
+
+                    if "metrics" in result and "loss" in result["metrics"]:
+                        client_losses[client_id] = result["metrics"]["loss"]
+
+                except Exception as e:
+                    errors.append(str(e))
+
 
         # aggregate and apply
         completed_at = datetime.utcnow()
@@ -488,6 +518,8 @@ class FLOrchestrator:
         })
 
         return results
+
+
 
     @property
     def history(self) -> List[RoundMetrics]:
