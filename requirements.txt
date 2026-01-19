@@ -10,3 +10,9 @@ black
 fastapi
 uvicorn
 httpx
+
+matplotlib
+seaborn
+pydantic
+jupyterlab
+ipykernel

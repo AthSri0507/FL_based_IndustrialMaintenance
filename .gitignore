@@ -6,7 +6,7 @@ __pycache__/
 .pytest_cache/
 
 # Data (never commit generated data)
-data/**
+data/
 !data/.gitkeep
 
 # Experiments & logs
@@ -54,4 +54,4 @@ requirements.md
 
 docs/
 *.png
-*.csv
+experiments/*.csv
