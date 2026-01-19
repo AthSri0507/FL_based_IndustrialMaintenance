@@ -333,6 +333,19 @@ def get_loss_function(task: TaskType) -> Callable:
         return None
     else:
         raise ValueError(f"Unknown task type: {task}")
+# ---------------------- Differential Privacy Utilities ----------------------
+
+def adaptive_dp_noise(
+    round_id: int,
+    base_noise: float,
+    decay: float,
+    min_noise: float,
+    max_noise: float,
+) -> float:
+    """Round-based adaptive DP noise schedule."""
+    sigma = base_noise * (decay ** round_id)
+    return max(min_noise, min(max_noise, sigma))
+
 
 
 # ---------------------- Simulated Client Trainer ----------------------
@@ -972,13 +985,46 @@ class SimulatedClientTrainer:
             self._last_train_metrics = train_metrics
             self._last_val_metrics = val_metrics
             
-            # Compute delta (local - global)
+            # ---------------- Differential Privacy: delta computation ----------------
             delta = {}
             global_sd = {k: v.cpu() for k, v in model.state_dict().items()}
             local_sd = {k: v.cpu() for k, v in local_model.state_dict().items()}
-            
+
+            # Compute total L2 norm of update (for clipping)
+            if self.config.dp_enabled:
+                total_norm = torch.sqrt(
+                    sum((local_sd[k] - global_sd[k]).pow(2).sum() for k in global_sd)
+                )
+
+                clip_norm = self.config.dp_clip_norm
+                clip_factor = min(1.0, clip_norm / (total_norm + 1e-8))
+
+                # Adaptive or fixed noise
+                if self.config.dp_adaptive:
+                    round_id = global_state.get("round", 0)
+                    sigma = adaptive_dp_noise(
+                        round_id=round_id,
+                        base_noise=self.config.dp_base_noise,
+                        decay=self.config.dp_decay,
+                        min_noise=self.config.dp_min_noise,
+                        max_noise=self.config.dp_max_noise,
+                    )
+                else:
+                    sigma = self.config.dp_base_noise
+            else:
+                clip_factor = 1.0
+                sigma = 0.0
+
+            # Apply clipping + noise
             for key in global_sd.keys():
-                delta[key] = (local_sd[key] - global_sd[key]).detach().clone()
+                update = (local_sd[key] - global_sd[key]) * clip_factor
+
+                if sigma > 0:
+                    noise = torch.randn_like(update) * sigma
+                    update = update + noise
+
+                delta[key] = update.detach().clone()
+
             
             training_time = time.time() - start_time
             
@@ -1035,9 +1081,19 @@ class Client(SimulatedClientTrainer):
         config = ClientConfig(
             task=TaskType.RUL,
             val_split=0.2,
-            early_stopping_enabled=False,  # Original didn't have proper early stopping
-            normalize_per_channel=False,  # Original didn't normalize
-        )
+            early_stopping_enabled=False,
+            normalize_per_channel=False,
+
+            # DP defaults (OFF for backward compatibility)
+            dp_enabled=False,
+            dp_adaptive=False,
+            dp_clip_norm=1.0,
+            dp_base_noise=1.0,
+            dp_min_noise=0.1,
+            dp_max_noise=2.0,
+            dp_decay=0.98,
+)
+
         super().__init__(client_id=client_id, data=data, config=config)
     
     def train_local(self, global_state: dict, config: dict) -> dict:
@@ -1045,7 +1101,7 @@ class Client(SimulatedClientTrainer):
         
         Args:
             global_state: Must contain "model" key with nn.Module
-            config: Training config dictionary (mapped to ClientConfig)
+            config: Training config dictionary (mapped to data )
             
         Returns:
             Dictionary with client_id, num_samples, delta, metrics, epochs_ran
