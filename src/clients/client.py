@@ -106,6 +106,18 @@ class ClientConfig:
     # "fedprox": FedProx with proximal regularization
     algorithm: str = "fedavg"
     fedprox_mu: float = 0.01  # Proximal term coefficient (only used when algorithm="fedprox")
+    # ---------------- Differential Privacy (Client-side) ----------------
+    dp_enabled: bool = False
+    dp_adaptive: bool = False
+
+    # Gradient clipping
+    dp_clip_norm: float = 1.0
+
+    # Noise parameters
+    dp_base_noise: float = 1.0
+    dp_min_noise: float = 0.1
+    dp_max_noise: float = 2.0
+    dp_decay: float = 0.98
 
 
 # ---------------------- Metrics Functions ----------------------
@@ -1085,7 +1097,7 @@ class Client(SimulatedClientTrainer):
             normalize_per_channel=False,
 
             # DP defaults (OFF for backward compatibility)
-            dp_enabled=False,
+            dp_enabled =False,
             dp_adaptive=False,
             dp_clip_norm=1.0,
             dp_base_noise=1.0,
