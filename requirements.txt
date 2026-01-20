@@ -10,3 +10,6 @@ black
 fastapi
 uvicorn
 httpx
+matplotlib
+seaborn
+deepcopy
